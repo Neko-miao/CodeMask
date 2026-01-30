@@ -1,0 +1,13 @@
+# IDE
+.idea/
+
+# Unity generated folders
+Library/
+Logs/
+Temp/
+obj/
+
+# Visual Studio / Rider solution and project files
+*.sln
+*.csproj
+
