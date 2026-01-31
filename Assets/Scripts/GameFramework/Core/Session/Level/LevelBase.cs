@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using GameConfigs;
 using UnityEngine;
 
 namespace GameFramework.Session
@@ -14,26 +15,26 @@ namespace GameFramework.Session
     public abstract class LevelBase : ILevel
     {
         protected readonly List<ILevelObjective> _objectives = new List<ILevelObjective>();
-        protected LevelData _data;
+        protected LevelRuntimeData _data;
         
         #region Properties
         
         public int LevelId { get; protected set; }
         public string LevelName { get; protected set; }
-        public ILevelConfig Config { get; protected set; }
+        public LevelData Config { get; protected set; }
         public LevelState State { get; protected set; }
         public virtual float Progress => CalculateProgress();
         public ILevelData Data => _data;
         
         #endregion
         
-        public LevelBase(ILevelConfig config)
+        public LevelBase(LevelData config)
         {
             Config = config;
-            LevelId = config.LevelId;
-            LevelName = config.LevelName;
+            LevelId = config.levelId;
+            LevelName = config.levelName;
             State = LevelState.None;
-            _data = new LevelData();
+            _data = new LevelRuntimeData();
         }
         
         #region Lifecycle
@@ -222,20 +223,39 @@ namespace GameFramework.Session
         
         protected virtual int CalculateStars()
         {
-            int stars = 1;
+            var starCondition = Config?.starCondition;
+            if (starCondition == null)
+            {
+                // 默认计算方式
+                int stars = 1;
+                if (Config.timeLimit > 0 && _data.ElapsedTime < Config.timeLimit * 0.5f)
+                    stars++;
+                if (Config.reward != null && _data.Score >= Config.reward.gold)
+                    stars++;
+                return Mathf.Clamp(stars, 1, 3);
+            }
             
-            // 基于时间评价
-            if (Config.TimeLimit > 0 && _data.ElapsedTime < Config.TimeLimit * 0.5f)
-                stars++;
+            // 使用配置的星级条件计算
+            int resultStars = 1;
             
-            // 基于分数评价
-            if (Config.TargetScore > 0 && _data.Score >= Config.TargetScore)
-                stars++;
+            // 二星条件
+            if (starCondition.timeLimitForTwoStar <= 0 || _data.ElapsedTime <= starCondition.timeLimitForTwoStar)
+            {
+                resultStars = 2;
+            }
             
-            return Mathf.Clamp(stars, 1, 3);
+            // 三星条件
+            bool timeOk = starCondition.timeLimitForThreeStar <= 0 || _data.ElapsedTime <= starCondition.timeLimitForThreeStar;
+            bool damageOk = starCondition.maxDamageCountForThreeStar < 0 || _data.DamageCount <= starCondition.maxDamageCountForThreeStar;
+            
+            if (timeOk && damageOk)
+            {
+                resultStars = 3;
+            }
+            
+            return resultStars;
         }
         
         #endregion
     }
 }
-

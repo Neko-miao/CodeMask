@@ -7,6 +7,7 @@ using GameFramework.UI;
 using GameFramework.Session;
 using Game.UI;
 using Game.Battle;
+using Game.Modules;
 using UnityEngine;
 
 namespace Game.States
@@ -42,6 +43,9 @@ namespace Game.States
         {
             Debug.Log("[InGameStateHandler] Exiting InGame State");
             
+            // 销毁主玩家
+            DestroyMainPlayer();
+            
             // 关闭战斗UI
             var uiMgr = GameInstance.Instance.GetComp<IUIMgr>();
             if (uiMgr != null && _battleUIController != null)
@@ -71,16 +75,60 @@ namespace Game.States
                     AutoStartLevel = true
                 };
                 
-                // 使用协程启动Session，完成后启动战斗
+                // 使用协程启动Session，完成后生成玩家并启动战斗
                 session.StartSession(config, () =>
                 {
+                    // 生成主玩家
+                    SpawnMainPlayer();
+                    
+                    // 启动战斗
                     _battleController?.StartBattle(1);
                 });
             }
             else
             {
-                // 无Session时直接启动战斗
+                // 无Session时直接生成玩家并启动战斗
+                SpawnMainPlayer();
                 _battleController?.StartBattle(1);
+            }
+        }
+        
+        /// <summary>
+        /// 生成主玩家
+        /// </summary>
+        private void SpawnMainPlayer()
+        {
+            var playerMdl = GameInstance.Instance.GetComp<IPlayerMdl>();
+            if (playerMdl == null)
+            {
+                Debug.LogWarning("[InGameStateHandler] PlayerMdl not found");
+                return;
+            }
+            
+            // 根据PlayerConfig配置生成主玩家
+            // 使用默认角色和配置中的生成位置
+            var player = playerMdl.SpawnMainPlayer();
+            
+            if (player != null)
+            {
+                Debug.Log($"[InGameStateHandler] Main player spawned: {player.CharacterData?.characterName ?? "Unknown"}");
+            }
+            else
+            {
+                Debug.LogError("[InGameStateHandler] Failed to spawn main player");
+            }
+        }
+        
+        /// <summary>
+        /// 销毁主玩家
+        /// </summary>
+        private void DestroyMainPlayer()
+        {
+            var playerMdl = GameInstance.Instance.GetComp<IPlayerMdl>();
+            if (playerMdl != null && playerMdl.HasMainPlayer)
+            {
+                playerMdl.DestroyMainPlayer();
+                Debug.Log("[InGameStateHandler] Main player destroyed");
             }
         }
     }

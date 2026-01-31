@@ -807,7 +807,7 @@ GameObject:
   - component: {fileID: 4014342776388882454}
   - component: {fileID: 4141791257045060992}
   - component: {fileID: 2258394171788773527}
-  - component: {fileID: 4076210688779849427}
+  - component: {fileID: 1234567890123456789}
   m_Layer: 5
   m_Name: MainMenuView
   m_TagString: Untagged
@@ -879,7 +879,7 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 32
---- !u!114 &4076210688779849427
+--- !u!114 &1234567890123456789
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -891,7 +891,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0a224c5cd5de9d9449e0907889bd2aff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _layer: 100
+  _layer: 0
   _startGameBtn: {fileID: 7083831062252273273}
   _continueGameBtn: {fileID: 8627095402599984354}
   _settingsBtn: {fileID: 2630519792599392584}

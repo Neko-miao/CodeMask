@@ -1,0 +1,61 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9526ecf89f4faae4eb09c3706d7b7c3d, type: 3}
+  m_Name: PlayerConfig
+  m_EditorClassIdentifier: 
+  defaultCharacterId: 10086
+  spawnConfig:
+    defaultSpawnPosition: {x: 0, y: 0, z: 0}
+    defaultSpawnRotation: {x: 0, y: 0, z: 0}
+    useSceneSpawnPoint: 1
+    spawnPointTag: Player
+    spawnInvincibleTime: 2
+    respawnDelay: 3
+    allowRespawn: 1
+    maxRespawnCount: -1
+  characters:
+  - characterId: 10086
+    characterName: 
+    description: 
+    icon: {fileID: 0}
+    playerPrefab: {fileID: 3417528055645283926, guid: 282602ba2d905a94895aa261aec3974f, type: 3}
+    playerPrefabPath: Players/AKAKI
+    defaultModelId: 0
+    models: []
+    prefabPath: 
+    prefab: {fileID: 0}
+    baseStats:
+      maxHealth: 0
+      healthRegen: 0
+      attackPower: 0
+      attackSpeed: 0
+      attackRange: 0
+      defense: 0
+      moveSpeed: 0
+      jumpForce: 0
+      dashSpeedMultiplier: 0
+      dashDuration: 0
+      invincibleDuration: 0
+    use2DSpriteAnimation: 0
+    spriteAnimations: []
+    animatorController: {fileID: 0}
+    attackSoundPath: 
+    hurtSoundPath: 
+    dieSoundPath: 
+    jumpSoundPath: 
+  levelDataList:
+  - level: 0
+    expRequired: 0
+    baseHealth: 0
+    baseAttack: 0
+    baseDefense: 0
+    baseMoveSpeed: 0

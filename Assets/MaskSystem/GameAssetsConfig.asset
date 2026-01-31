@@ -15,9 +15,9 @@ MonoBehaviour:
   _maskVisuals:
   - Type: 1
     DisplayName: 
-    Icon: {fileID: 0}
-    CharacterSprite: {fileID: 0}
-    MaskSprite: {fileID: 0}
+    Icon: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
+    CharacterSprite: {fileID: 21300000, guid: 8f1f173c4225be448996ad89b09ecd2f, type: 3}
+    MaskSprite: {fileID: 10913, guid: 0000000000000000f000000000000000, type: 0}
     ThemeColor: {r: 1, g: 0.8, b: 0.4, a: 1}
     GlowColor: {r: 1, g: 0.8, b: 0.4, a: 1}
     BackgroundColor: {r: 0.2, g: 0.2, b: 0.2, a: 0.8}
@@ -54,9 +54,9 @@ MonoBehaviour:
     AttackAnimator: {fileID: 0}
   - Type: 4
     DisplayName: 
-    Icon: {fileID: 0}
-    CharacterSprite: {fileID: 0}
-    MaskSprite: {fileID: 0}
+    Icon: {fileID: 21300000, guid: 8f1f173c4225be448996ad89b09ecd2f, type: 3}
+    CharacterSprite: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
+    MaskSprite: {fileID: 10901, guid: 0000000000000000f000000000000000, type: 0}
     ThemeColor: {r: 0.8, g: 0.6, b: 0.4, a: 1}
     GlowColor: {r: 0.8, g: 0.6, b: 0.4, a: 1}
     BackgroundColor: {r: 0.2, g: 0.2, b: 0.2, a: 0.8}
@@ -157,7 +157,7 @@ MonoBehaviour:
     BGMVolume: 0.8
     TitleImage: {fileID: 0}
     TransitionColor: {r: 0.2, g: 0.1, b: 0.3, a: 1}
-  HealthBarFill: {fileID: 0}
+  HealthBarFill: {fileID: 21300000, guid: 8f1f173c4225be448996ad89b09ecd2f, type: 3}
   HealthBarBackground: {fileID: 0}
   WarningBarFill: {fileID: 0}
   MaskSlotBackground: {fileID: 0}

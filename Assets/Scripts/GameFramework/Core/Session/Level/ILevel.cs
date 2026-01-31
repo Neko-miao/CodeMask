@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using GameConfigs;
 
 namespace GameFramework.Session
 {
@@ -58,7 +59,7 @@ namespace GameFramework.Session
         /// <summary>
         /// 关卡配置
         /// </summary>
-        ILevelConfig Config { get; }
+        LevelData Config { get; }
         
         /// <summary>
         /// 关卡状态
@@ -165,4 +166,3 @@ namespace GameFramework.Session
         #endregion
     }
 }
-

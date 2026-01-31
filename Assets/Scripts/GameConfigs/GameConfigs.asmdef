@@ -1,9 +1,7 @@
 {
-    "name": "GameFramework",
-    "references": [
-        "Unity.ugui",
-        "GameConfigs"
-    ],
+    "name": "GameConfigs",
+    "rootNamespace": "GameConfigs",
+    "references": [],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
@@ -14,4 +12,3 @@
     "versionDefines": [],
     "noEngineReferences": false
 }
-

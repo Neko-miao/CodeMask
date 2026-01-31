@@ -5,6 +5,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using GameConfigs;
 using GameFramework.Core;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -266,10 +267,10 @@ namespace GameFramework.Session
             var configs = _levelMgr.GetAllLevelConfigs();
             foreach (var config in configs)
             {
-                if (config.LevelName == levelName)
+                if (config.levelName == levelName)
                 {
                     bool isLoaded = false;
-                    LoadLevel(config.LevelId, () => isLoaded = true);
+                    LoadLevel(config.levelId, () => isLoaded = true);
                     
                     while (!isLoaded)
                     {
@@ -414,8 +415,8 @@ namespace GameFramework.Session
     /// </summary>
     public class LevelMgr : ILevelMgr
     {
-        private readonly Dictionary<int, ILevelConfig> _levelConfigs = new Dictionary<int, ILevelConfig>();
-        private readonly List<ILevelConfig> _configList = new List<ILevelConfig>();
+        private readonly Dictionary<int, LevelData> _levelConfigs = new Dictionary<int, LevelData>();
+        private readonly List<LevelData> _configList = new List<LevelData>();
         private readonly HashSet<int> _unlockedLevels = new HashSet<int>();
         
         private ILevel _currentLevel;
@@ -446,8 +447,39 @@ namespace GameFramework.Session
         
         public LevelMgr()
         {
+            // 从 GameConfigs 加载配置
+            LoadFromGameConfigs();
+            
             // 默认解锁第一关
             _unlockedLevels.Add(1);
+        }
+        
+        /// <summary>
+        /// 从 GameConfigs.ConfigManager 加载关卡配置
+        /// </summary>
+        private void LoadFromGameConfigs()
+        {
+            var levelConfig = ConfigManager.LevelConfig;
+            if (levelConfig == null)
+            {
+                Debug.LogWarning("[LevelMgr] LevelConfig not found in Resources/Configs");
+                return;
+            }
+            
+            foreach (var levelData in levelConfig.levels)
+            {
+                _levelConfigs[levelData.levelId] = levelData;
+                _configList.Add(levelData);
+                
+                // 处理默认解锁
+                if (levelData.isUnlockedByDefault)
+                {
+                    _unlockedLevels.Add(levelData.levelId);
+                }
+            }
+            
+            _configList.Sort((a, b) => a.levelId.CompareTo(b.levelId));
+            Debug.Log($"[LevelMgr] Loaded {_configList.Count} levels from GameConfigs");
         }
         
         #region Level Operations
@@ -456,20 +488,20 @@ namespace GameFramework.Session
         {
             if (!_levelConfigs.TryGetValue(levelId, out var config))
             {
-                // 如果没有注册配置，创建一个默认配置
-                config = new LevelConfig(levelId, $"Level_{levelId}", $"Level_{levelId}");
-                RegisterLevelConfig(config);
+                Debug.LogError($"[LevelMgr] Level config not found: {levelId}");
+                onComplete?.Invoke();
+                return null;
             }
             
             return LoadLevel(config, onComplete);
         }
         
-        public Coroutine LoadLevel(ILevelConfig config, Action onComplete = null)
+        public Coroutine LoadLevel(LevelData config, Action onComplete = null)
         {
             return GameInstance.Instance.RunCoroutine(LoadLevelCoroutine(config, onComplete));
         }
         
-        private IEnumerator LoadLevelCoroutine(ILevelConfig config, Action onComplete)
+        private IEnumerator LoadLevelCoroutine(LevelData config, Action onComplete)
         {
             if (config == null)
             {
@@ -478,15 +510,15 @@ namespace GameFramework.Session
             }
             
             _isLoading = true;
-            OnLevelLoadStart?.Invoke(config.LevelId);
+            OnLevelLoadStart?.Invoke(config.levelId);
             
             // 卸载当前关卡
             UnloadCurrentLevel();
             
             // 加载场景
-            if (!string.IsNullOrEmpty(config.SceneName))
+            if (!string.IsNullOrEmpty(config.sceneName))
             {
-                var operation = SceneManager.LoadSceneAsync(config.SceneName, LoadSceneMode.Additive);
+                var operation = SceneManager.LoadSceneAsync(config.sceneName, LoadSceneMode.Additive);
                 while (!operation.isDone)
                 {
                     OnLevelLoadProgress?.Invoke(operation.progress);
@@ -501,7 +533,7 @@ namespace GameFramework.Session
             _isLoading = false;
             OnLevelLoadComplete?.Invoke(_currentLevel);
             
-            Debug.Log($"[LevelMgr] Level loaded: {config.LevelId}");
+            Debug.Log($"[LevelMgr] Level loaded: {config.levelId}");
             onComplete?.Invoke();
         }
         
@@ -513,9 +545,9 @@ namespace GameFramework.Session
             level.OnUnload();
             
             // 卸载场景
-            if (level.Config != null && !string.IsNullOrEmpty(level.Config.SceneName))
+            if (level.Config != null && !string.IsNullOrEmpty(level.Config.sceneName))
             {
-                SceneManager.UnloadSceneAsync(level.Config.SceneName);
+                SceneManager.UnloadSceneAsync(level.Config.sceneName);
             }
             
             _currentLevel = null;
@@ -573,27 +605,58 @@ namespace GameFramework.Session
         
         #region Level Config
         
-        public void RegisterLevelConfig(ILevelConfig config)
-        {
-            if (config == null) return;
-            
-            _levelConfigs[config.LevelId] = config;
-            if (!_configList.Contains(config))
-            {
-                _configList.Add(config);
-                _configList.Sort((a, b) => a.LevelId.CompareTo(b.LevelId));
-            }
-        }
-        
-        public ILevelConfig GetLevelConfig(int levelId)
+        public LevelData GetLevelConfig(int levelId)
         {
             _levelConfigs.TryGetValue(levelId, out var config);
             return config;
         }
         
-        public IReadOnlyList<ILevelConfig> GetAllLevelConfigs()
+        public IReadOnlyList<LevelData> GetAllLevelConfigs()
         {
             return _configList;
+        }
+        
+        /// <summary>
+        /// 获取关卡的刷怪配置
+        /// </summary>
+        public LevelSpawnConfig GetSpawnConfig(int levelId)
+        {
+            var config = GetLevelConfig(levelId);
+            return config?.spawnConfig;
+        }
+        
+        /// <summary>
+        /// 获取关卡的奖励配置
+        /// </summary>
+        public LevelReward GetRewardConfig(int levelId)
+        {
+            var config = GetLevelConfig(levelId);
+            return config?.reward;
+        }
+        
+        /// <summary>
+        /// 获取关卡的星级评价条件
+        /// </summary>
+        public StarCondition GetStarCondition(int levelId)
+        {
+            var config = GetLevelConfig(levelId);
+            return config?.starCondition;
+        }
+        
+        /// <summary>
+        /// 获取当前关卡的刷怪配置
+        /// </summary>
+        public LevelSpawnConfig GetCurrentSpawnConfig()
+        {
+            return _currentLevel != null ? GetSpawnConfig(_currentLevel.LevelId) : null;
+        }
+        
+        /// <summary>
+        /// 获取当前关卡的奖励配置
+        /// </summary>
+        public LevelReward GetCurrentRewardConfig()
+        {
+            return _currentLevel != null ? GetRewardConfig(_currentLevel.LevelId) : null;
         }
         
         #endregion
@@ -645,17 +708,11 @@ namespace GameFramework.Session
             return _unlockedLevels.Contains(levelId);
         }
         
-        public IUnlockCondition GetUnlockCondition(int levelId)
-        {
-            var config = GetLevelConfig(levelId);
-            return config?.UnlockCondition;
-        }
-        
         #endregion
         
         #region Private Methods
         
-        private ILevel CreateLevelInstance(ILevelConfig config)
+        private ILevel CreateLevelInstance(LevelData config)
         {
             // 这里可以根据配置创建不同类型的关卡
             // 默认使用DefaultLevel
@@ -670,7 +727,7 @@ namespace GameFramework.Session
     /// </summary>
     public class DefaultLevel : LevelBase
     {
-        public DefaultLevel(ILevelConfig config) : base(config)
+        public DefaultLevel(LevelData config) : base(config)
         {
         }
     }

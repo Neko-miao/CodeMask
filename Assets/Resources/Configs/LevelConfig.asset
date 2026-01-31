@@ -1,0 +1,247 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a1b2c3d4e5f6789012345678abcdef01, type: 3}
+  m_Name: LevelConfig
+  m_EditorClassIdentifier: 
+  levels:
+  - levelId: 1
+    levelName: "\u5FEB\u4E50\u68EE\u6797"
+    description: "\u8FDB\u5165\u795E\u79D8\u7684\u68EE\u6797\uFF0C\u51FB\u8D25\u6240\u6709\u602A\u7269\uFF01"
+    iconPath: Icons/Levels/level_1
+    scenePath: Assets/Resources/Scenes/Level_Forest_Art.unity
+    sceneName: Level_Forest_Art
+    chapter: 1
+    orderInChapter: 1
+    difficulty: 1
+    recommendedLevel: 1
+    isUnlockedByDefault: 1
+    prerequisiteLevelId: 0
+    spawnConfig:
+      spawnPoints:
+      - pointName: SpawnPoint_Left
+        position: {x: -10, y: 0, z: 0}
+        rotation: {x: 0, y: 90, z: 0}
+        isEnabled: 1
+      - pointName: SpawnPoint_Right
+        position: {x: 10, y: 0, z: 0}
+        rotation: {x: 0, y: -90, z: 0}
+        isEnabled: 1
+      - pointName: SpawnPoint_Top
+        position: {x: 0, y: 0, z: 10}
+        rotation: {x: 0, y: 180, z: 0}
+        isEnabled: 1
+      waves:
+      - waveName: Wave 1
+        startDelay: 2
+        duration: 0
+        spawnEntries:
+        - monsterType: 100
+          count: 3
+          delay: 0
+          interval: 1
+          spawnPointIndex: -1
+        - monsterType: 101
+          count: 2
+          delay: 2
+          interval: 0.5
+          spawnPointIndex: -1
+        requireKillAll: 1
+        completionDelay: 3
+      - waveName: Wave 2
+        startDelay: 0
+        duration: 0
+        spawnEntries:
+        - monsterType: 102
+          count: 2
+          delay: 0
+          interval: 1.5
+          spawnPointIndex: 0
+        - monsterType: 103
+          count: 2
+          delay: 1
+          interval: 1
+          spawnPointIndex: 1
+        requireKillAll: 1
+        completionDelay: 3
+      - waveName: Boss Wave
+        startDelay: 0
+        duration: 0
+        spawnEntries:
+        - monsterType: 1000
+          count: 1
+          delay: 2
+          interval: 0
+          spawnPointIndex: 2
+        requireKillAll: 1
+        completionDelay: 5
+      loopWaves: 0
+      maxActiveMonsters: 30
+    reward:
+      gold: 100
+      exp: 50
+      firstClearBonusGold: 200
+      perfectClearBonus: 300
+    starCondition:
+      requireComplete: 1
+      timeLimitForTwoStar: 180
+      timeLimitForThreeStar: 120
+      maxDamageCountForThreeStar: 3
+    timeLimit: 300
+    lifeLimit: 3
+  - levelId: 2
+    levelName: "\u6DF1\u6D77\u5192\u9669"
+    description: "\u6F5C\u5165\u6DF1\u6D77\uFF0C\u5BFB\u627E\u9690\u85CF\u7684\u5B9D\u85CF\uFF01"
+    iconPath: Icons/Levels/level_2
+    scenePath: Assets/Resources/Scenes/OceanLevel.unity
+    sceneName: OceanLevel
+    chapter: 1
+    orderInChapter: 2
+    difficulty: 1
+    recommendedLevel: 5
+    isUnlockedByDefault: 0
+    prerequisiteLevelId: 1
+    spawnConfig:
+      spawnPoints:
+      - pointName: SpawnPoint_Left
+        position: {x: -12, y: 0, z: 0}
+        rotation: {x: 0, y: 90, z: 0}
+        isEnabled: 1
+      - pointName: SpawnPoint_Right
+        position: {x: 12, y: 0, z: 0}
+        rotation: {x: 0, y: -90, z: 0}
+        isEnabled: 1
+      waves:
+      - waveName: Wave 1
+        startDelay: 3
+        duration: 0
+        spawnEntries:
+        - monsterType: 200
+          count: 2
+          delay: 0
+          interval: 2
+          spawnPointIndex: -1
+        - monsterType: 201
+          count: 3
+          delay: 3
+          interval: 1
+          spawnPointIndex: -1
+        requireKillAll: 1
+        completionDelay: 3
+      - waveName: Boss Wave
+        startDelay: 0
+        duration: 0
+        spawnEntries:
+        - monsterType: 1001
+          count: 1
+          delay: 2
+          interval: 0
+          spawnPointIndex: 0
+        requireKillAll: 1
+        completionDelay: 5
+      loopWaves: 0
+      maxActiveMonsters: 40
+    reward:
+      gold: 150
+      exp: 80
+      firstClearBonusGold: 300
+      perfectClearBonus: 400
+    starCondition:
+      requireComplete: 1
+      timeLimitForTwoStar: 200
+      timeLimitForThreeStar: 150
+      maxDamageCountForThreeStar: 5
+    timeLimit: 360
+    lifeLimit: 3
+  - levelId: 3
+    levelName: "\u5929\u7A7A\u4E4B\u57CE"
+    description: "\u98DE\u5411\u5929\u7A7A\u4E4B\u57CE\uFF0C\u6311\u6218\u6700\u5F3A\u7684\u654C\u4EBA\uFF01"
+    iconPath: Icons/Levels/level_3
+    scenePath: Assets/Resources/Scenes/SkyLevel.unity
+    sceneName: SkyLevel
+    chapter: 2
+    orderInChapter: 1
+    difficulty: 2
+    recommendedLevel: 10
+    isUnlockedByDefault: 0
+    prerequisiteLevelId: 2
+    spawnConfig:
+      spawnPoints:
+      - pointName: SpawnPoint_Sky1
+        position: {x: -8, y: 5, z: 0}
+        rotation: {x: 0, y: 90, z: 0}
+        isEnabled: 1
+      - pointName: SpawnPoint_Sky2
+        position: {x: 8, y: 5, z: 0}
+        rotation: {x: 0, y: -90, z: 0}
+        isEnabled: 1
+      - pointName: SpawnPoint_Sky3
+        position: {x: 0, y: 8, z: 8}
+        rotation: {x: 0, y: 180, z: 0}
+        isEnabled: 1
+      waves:
+      - waveName: Wave 1
+        startDelay: 2
+        duration: 0
+        spawnEntries:
+        - monsterType: 300
+          count: 2
+          delay: 0
+          interval: 2
+          spawnPointIndex: -1
+        - monsterType: 302
+          count: 4
+          delay: 1
+          interval: 0.8
+          spawnPointIndex: -1
+        requireKillAll: 1
+        completionDelay: 3
+      - waveName: Wave 2
+        startDelay: 0
+        duration: 0
+        spawnEntries:
+        - monsterType: 301
+          count: 1
+          delay: 0
+          interval: 0
+          spawnPointIndex: 0
+        - monsterType: 303
+          count: 6
+          delay: 2
+          interval: 0.5
+          spawnPointIndex: -1
+        requireKillAll: 1
+        completionDelay: 3
+      - waveName: Boss Wave
+        startDelay: 0
+        duration: 0
+        spawnEntries:
+        - monsterType: 1002
+          count: 1
+          delay: 3
+          interval: 0
+          spawnPointIndex: 2
+        requireKillAll: 1
+        completionDelay: 5
+      loopWaves: 0
+      maxActiveMonsters: 50
+    reward:
+      gold: 250
+      exp: 150
+      firstClearBonusGold: 500
+      perfectClearBonus: 600
+    starCondition:
+      requireComplete: 1
+      timeLimitForTwoStar: 240
+      timeLimitForThreeStar: 180
+      maxDamageCountForThreeStar: 2
+    timeLimit: 420
+    lifeLimit: 3

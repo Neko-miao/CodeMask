@@ -28,6 +28,11 @@ namespace GameFramework.Session
         string CurrentCheckpoint { get; set; }
         
         /// <summary>
+        /// 受伤次数
+        /// </summary>
+        int DamageCount { get; set; }
+        
+        /// <summary>
         /// 获取自定义数据
         /// </summary>
         T GetData<T>(string key);
@@ -46,13 +51,14 @@ namespace GameFramework.Session
     /// <summary>
     /// 关卡运行时数据实现
     /// </summary>
-    public class LevelData : ILevelData
+    public class LevelRuntimeData : ILevelData
     {
         private readonly Dictionary<string, object> _customData = new Dictionary<string, object>();
         
         public float ElapsedTime { get; set; }
         public int Score { get; set; }
         public string CurrentCheckpoint { get; set; }
+        public int DamageCount { get; set; }
         
         public T GetData<T>(string key)
         {
@@ -73,8 +79,8 @@ namespace GameFramework.Session
             ElapsedTime = 0f;
             Score = 0;
             CurrentCheckpoint = null;
+            DamageCount = 0;
             _customData.Clear();
         }
     }
 }
-

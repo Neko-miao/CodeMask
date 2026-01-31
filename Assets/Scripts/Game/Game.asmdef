@@ -3,6 +3,7 @@
     "rootNamespace": "Game",
     "references": [
         "GameFramework",
+        "GameConfigs",
         "Unity.ugui"
     ],
     "includePlatforms": [],

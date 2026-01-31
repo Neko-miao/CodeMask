@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using GameConfigs;
 using UnityEngine;
 
 namespace GameFramework.Session
@@ -52,7 +53,7 @@ namespace GameFramework.Session
         /// <summary>
         /// 加载关卡 (协程)
         /// </summary>
-        Coroutine LoadLevel(ILevelConfig config, Action onComplete = null);
+        Coroutine LoadLevel(LevelData levelData, Action onComplete = null);
         
         /// <summary>
         /// 卸载当前关卡
@@ -79,19 +80,14 @@ namespace GameFramework.Session
         #region Level Config
         
         /// <summary>
-        /// 注册关卡配置
-        /// </summary>
-        void RegisterLevelConfig(ILevelConfig config);
-        
-        /// <summary>
         /// 获取关卡配置
         /// </summary>
-        ILevelConfig GetLevelConfig(int levelId);
+        LevelData GetLevelConfig(int levelId);
         
         /// <summary>
         /// 获取所有关卡配置
         /// </summary>
-        IReadOnlyList<ILevelConfig> GetAllLevelConfigs();
+        IReadOnlyList<LevelData> GetAllLevelConfigs();
         
         #endregion
         
@@ -130,11 +126,6 @@ namespace GameFramework.Session
         /// 检查关卡是否已解锁
         /// </summary>
         bool IsLevelUnlocked(int levelId);
-        
-        /// <summary>
-        /// 获取解锁条件
-        /// </summary>
-        IUnlockCondition GetUnlockCondition(int levelId);
         
         #endregion
         
