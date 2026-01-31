@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Game.Events;
 
 namespace Game
 {
@@ -89,6 +90,11 @@ namespace Game
         /// 节奏未命中事件
         /// </summary>
         public event Action<Rhythm> OnRhythmMiss;
+
+        /// <summary>
+        /// 全局节奏触发事件（静态事件，供其他系统订阅）
+        /// </summary>
+        public static event Action<RhythmTriggerEvent> OnRhythmTriggerEvent;
 
         #endregion
 
@@ -206,6 +212,9 @@ namespace Game
             // 触发事件
             OnRhythmTriggered?.Invoke(grade, closestRhythm);
 
+            // 发布全局事件
+            PublishRhythmTriggerEvent(closestRhythm.MaskType, closestRhythm.ActionType, grade);
+
             // 通知RhythmSystem移除并销毁
             RhythmSystem.Instance.RemoveAndDestroyRhythm(closestRhythm);
 
@@ -266,6 +275,9 @@ namespace Game
 
             // 触发事件
             OnRhythmTriggered?.Invoke(grade, closestRhythm);
+
+            // 发布全局事件
+            PublishRhythmTriggerEvent(closestRhythm.MaskType, closestRhythm.ActionType, grade);
 
             // 通知RhythmSystem移除并销毁
             RhythmSystem.Instance.RemoveAndDestroyRhythm(closestRhythm);
@@ -329,6 +341,22 @@ namespace Game
 
             // 触发未命中事件
             OnRhythmMiss?.Invoke(rhythm);
+
+            // 发布全局事件
+            PublishRhythmTriggerEvent(rhythm.MaskType, rhythm.ActionType, RhythmScoreGrade.Miss);
+        }
+
+        /// <summary>
+        /// 发布节奏触发全局事件
+        /// </summary>
+        /// <param name="maskType">面具类型</param>
+        /// <param name="actionType">行为类型</param>
+        /// <param name="grade">评分等级</param>
+        private void PublishRhythmTriggerEvent(MaskType maskType, RhythmActionType actionType, RhythmScoreGrade grade)
+        {
+            var evt = new RhythmTriggerEvent(maskType, actionType, grade);
+            OnRhythmTriggerEvent?.Invoke(evt);
+            Debug.Log($"[RhythmTriggerZone] 已发布 RhythmTriggerEvent: MaskType={maskType}, ActionType={actionType}, Grade={grade}");
         }
 
         /// <summary>

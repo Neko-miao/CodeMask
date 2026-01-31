@@ -649,19 +649,30 @@ namespace Game
         /// <param name="targetPosition">目标位置</param>
         public void PlayAttackEffect(Vector3 startPosition, Vector3 targetPosition)
         {
+            PlayAttackEffect(startPosition, targetPosition, null);
+        }
+
+        /// <summary>
+        /// 播放攻击特效（带回调）
+        /// </summary>
+        /// <param name="startPosition">起始位置</param>
+        /// <param name="targetPosition">目标位置</param>
+        /// <param name="onReachTarget">抵达目标点时的回调</param>
+        public void PlayAttackEffect(Vector3 startPosition, Vector3 targetPosition, System.Action onReachTarget)
+        {
             if (attackEff == null)
             {
                 Debug.LogWarning("[EffectSystem] attackEff预制体未设置");
                 return;
             }
 
-            StartCoroutine(AttackEffectCoroutine(startPosition, targetPosition));
+            StartCoroutine(AttackEffectCoroutine(startPosition, targetPosition, onReachTarget));
         }
 
         /// <summary>
         /// 攻击特效协程
         /// </summary>
-        private IEnumerator AttackEffectCoroutine(Vector3 startPosition, Vector3 targetPosition)
+        private IEnumerator AttackEffectCoroutine(Vector3 startPosition, Vector3 targetPosition, System.Action onReachTarget = null)
         {
             // 在起始点生成特效
             GameObject effectInstance = Instantiate(attackEff, startPosition, Quaternion.identity);
@@ -690,6 +701,9 @@ namespace Game
 
             // 确保到达目标点
             effectInstance.transform.position = targetPosition;
+
+            // 触发抵达目标点回调
+            onReachTarget?.Invoke();
 
             // 等待剩余时间后销毁 (0.25s - 0.1s = 0.15s)
             float remainingTime = attackEffectLifeTime - attackEffectMoveTime;

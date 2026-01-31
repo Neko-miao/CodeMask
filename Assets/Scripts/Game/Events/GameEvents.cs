@@ -145,5 +145,37 @@ namespace Game.Events
     }
     
     #endregion
+    
+    #region Rhythm Events
+    
+    /// <summary>
+    /// 节奏触发事件数据
+    /// </summary>
+    public struct RhythmTriggerEvent
+    {
+        /// <summary>
+        /// 面具类型
+        /// </summary>
+        public MaskType MaskType;
+        
+        /// <summary>
+        /// 节奏行为类型
+        /// </summary>
+        public RhythmActionType ActionType;
+        
+        /// <summary>
+        /// 触发结果
+        /// </summary>
+        public RhythmScoreGrade Result;
+        
+        public RhythmTriggerEvent(MaskType maskType, RhythmActionType actionType, RhythmScoreGrade result)
+        {
+            MaskType = maskType;
+            ActionType = actionType;
+            Result = result;
+        }
+    }
+    
+    #endregion
 }
 
