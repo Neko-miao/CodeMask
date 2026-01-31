@@ -5,11 +5,50 @@ using UnityEngine;
 namespace Game
 {
     /// <summary>
-    /// 视差背景控制器
+    /// 视差背景控制器（单例）
     /// 实现前景、中景、背景不同速度的循环滚动效果
     /// </summary>
-    public class BGController : MonoBehaviour, IBGController
+    public class BGInstance : MonoBehaviour, IBGController
     {
+        #region 单例
+
+        private static BGInstance _instance;
+
+        /// <summary>
+        /// 单例实例
+        /// </summary>
+        public static BGInstance Instance
+        {
+            get
+            {
+                if (_instance == null)
+                {
+                    _instance = FindObjectOfType<BGInstance>();
+                }
+                return _instance;
+            }
+        }
+
+        private void Awake()
+        {
+            if (_instance != null && _instance != this)
+            {
+                Destroy(gameObject);
+                return;
+            }
+            _instance = this;
+        }
+
+        private void OnDestroy()
+        {
+            if (_instance == this)
+            {
+                _instance = null;
+            }
+        }
+
+        #endregion
+
         [Header("背景层级引用")]
         [Tooltip("远景层（背景）- 移动最慢")]
         [SerializeField] private Transform distantViewGroup;
