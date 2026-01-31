@@ -31,10 +31,16 @@ namespace Game
         private List<Mask> maskQueue = new List<Mask>(3);
         private Dictionary<KeyCode, Mask> keyBindings = new Dictionary<KeyCode, Mask>();
         private Mask pendingMask;
+        private Mask currentWearingMask;  // 当前穿戴中的Mask
         private int perfectLaunchCount = 0;
         private int perfectCreateCount = 0;
 
         private static readonly KeyCode[] MaskKeys = { KeyCode.Q, KeyCode.W, KeyCode.E };
+
+        /// <summary>
+        /// 当前穿戴中的Mask（只读）
+        /// </summary>
+        public Mask CurrentWearingMask => currentWearingMask;
 
         #region Unity生命周期
 
@@ -64,10 +70,23 @@ namespace Game
 
         private void HandleKeyInput()
         {
+            // Mask穿戴按键 Q/W/E
             foreach (var key in MaskKeys)
             {
                 if (Input.GetKeyDown(key))
                     OnMaskKeyPressed(key);
+            }
+
+            // 测试按键
+            if (Input.GetKeyDown(KeyCode.Alpha1))
+            {
+                Debug.Log("[MaskSystem] 测试：按1创建Mask");
+                CreateMask();
+            }
+            if (Input.GetKeyDown(KeyCode.Alpha2))
+            {
+                Debug.Log("[MaskSystem] 测试：按2发射Mask");
+                LaunchRandomActiveMask();
             }
         }
 
@@ -102,19 +121,16 @@ namespace Game
         /// </summary>
         private void UnwearCurrentMask()
         {
-            foreach (var mask in maskQueue)
+            if (currentWearingMask != null)
             {
-                if (mask != null && mask.CurrentState == MaskState.Wearing)
-                {
-                    Debug.Log("[MaskSystem] 卸下当前穿戴的Mask");
-                    mask.ResetAndActivate();
-                    return;
-                }
+                Debug.Log("[MaskSystem] 卸下当前穿戴的Mask");
+                currentWearingMask.ResetAndActivate();
+                currentWearingMask = null;
             }
         }
 
         /// <summary>
-        /// 穿上指定Mask（飞向穿戴位置，到达后变为Wearing状态）
+        /// 穿上指定Mask（直接传送到穿戴位置）
         /// </summary>
         private void WearMask(Mask mask)
         {
@@ -124,9 +140,9 @@ namespace Game
                 return;
             }
 
-            // Debug.Log($"[MaskSystem] 穿上Mask: {mask.name}");
-            // mask.FlyToAndWear(wearingTargetPoint.position);
-            mask.SetState(MaskState.Wearing);
+            Debug.Log($"[MaskSystem] 穿上Mask: {mask.name}");
+            currentWearingMask = mask;
+            mask.WearAt(wearingTargetPoint.position);
         }
 
         #endregion
@@ -223,10 +239,18 @@ namespace Game
 
         private void LaunchRandomActiveMask()
         {
-            if (launchTargetPoint == null) return;
+            if (launchTargetPoint == null)
+            {
+                Debug.LogWarning("[MaskSystem] launchTargetPoint未设置，无法发射");
+                return;
+            }
 
             var activeMasks = maskQueue.FindAll(m => m != null && m.CurrentState == MaskState.Active);
-            if (activeMasks.Count == 0) return;
+            if (activeMasks.Count == 0)
+            {
+                Debug.Log("[MaskSystem] 没有Active状态的Mask可发射");
+                return;
+            }
 
             var selected = activeMasks[Random.Range(0, activeMasks.Count)];
             Debug.Log($"[MaskSystem] 发射Mask: {selected.name}");

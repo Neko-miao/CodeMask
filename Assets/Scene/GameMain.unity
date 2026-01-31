@@ -1432,6 +1432,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 4104425147389884707}
     - target: {fileID: 4573557792152166642, guid: 2a0005feb72a5c3479edc1bcdb8b3a58, type: 3}
+      propertyPath: wearingTargetPoint
+      value: 
+      objectReference: {fileID: 1663839438}
+    - target: {fileID: 4573557792152166642, guid: 2a0005feb72a5c3479edc1bcdb8b3a58, type: 3}
       propertyPath: keyActionTargetPoint
       value: 
       objectReference: {fileID: 1663839438}

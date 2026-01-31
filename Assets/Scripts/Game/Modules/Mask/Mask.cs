@@ -100,18 +100,16 @@ namespace Game
         }
 
         /// <summary>
-        /// 飞向目标并穿戴（按键穿戴用）
+        /// 直接穿戴到指定位置（瞬移）
         /// </summary>
-        public void FlyToAndWear(Vector2 target, float duration = -1f, float height = -1f)
+        public void WearAt(Vector2 position)
         {
             isCheckingMotion = false;
-            SetState(MaskState.Active);
-            OnFlightComplete = () =>
-            {
-                SetState(MaskState.Wearing);
-                OnFlightComplete = null;
-            };
-            LaunchToTarget(target, duration, height);
+            isFlying = false;
+            transform.position = position;
+            transform.rotation = Quaternion.identity;
+            if (rb != null) { rb.velocity = Vector2.zero; rb.angularVelocity = 0f; }
+            SetState(MaskState.Wearing);
         }
 
         /// <summary>
