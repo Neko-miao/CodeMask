@@ -232,6 +232,14 @@ namespace Game.MaskSystem
         }
 
         /// <summary>
+        /// 获取战斗管理器（供高级功能使用）
+        /// </summary>
+        public CombatManager GetCombatManager()
+        {
+            return _combatManager;
+        }
+
+        /// <summary>
         /// 清理资源
         /// </summary>
         public void Dispose()

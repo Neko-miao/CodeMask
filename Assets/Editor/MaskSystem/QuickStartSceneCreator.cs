@@ -3,6 +3,7 @@ using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Game.MaskSystem.Visual.Placeholder;
+using Game.MaskSystem.Rhythm;
 
 namespace Game.MaskSystem.Editor
 {
@@ -28,7 +29,24 @@ namespace Game.MaskSystem.Editor
             EditorApplication.isPlaying = true;
         }
 
-        [MenuItem("MaskSystem/创建快速开始场景", false, 1)]
+        [MenuItem("MaskSystem/快速开始节奏游戏 _F6", false, 1)]
+        public static void QuickStartRhythmGame()
+        {
+            // 如果正在运行，先停止
+            if (EditorApplication.isPlaying)
+            {
+                EditorApplication.isPlaying = false;
+                return;
+            }
+
+            // 创建节奏战斗场景
+            CreateRhythmBattleScene();
+
+            // 开始游戏
+            EditorApplication.isPlaying = true;
+        }
+
+        [MenuItem("MaskSystem/创建快速开始场景", false, 10)]
         public static void CreateQuickStartScene()
         {
             // 询问是否保存当前场景
@@ -53,7 +71,32 @@ namespace Game.MaskSystem.Editor
             Debug.Log("[QuickStartSceneCreator] 按 F5 或点击菜单 'MaskSystem/快速开始游戏' 来运行游戏");
         }
 
-        [MenuItem("MaskSystem/打开快速开始场景", false, 2)]
+        [MenuItem("MaskSystem/创建节奏战斗场景", false, 11)]
+        public static void CreateRhythmBattleScene()
+        {
+            // 询问是否保存当前场景
+            if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
+            {
+                return;
+            }
+
+            // 创建新场景
+            Scene newScene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
+
+            // 创建节奏战斗管理器对象
+            GameObject gameManager = new GameObject("RhythmGameManager");
+            RhythmBattleScene rhythmScene = gameManager.AddComponent<RhythmBattleScene>();
+
+            // 保存场景
+            string scenePath = "Assets/Scenes/RhythmBattleScene.unity";
+            EnsureDirectoryExists("Assets/Scenes");
+            EditorSceneManager.SaveScene(newScene, scenePath);
+
+            Debug.Log($"[QuickStartSceneCreator] 节奏战斗场景已创建: {scenePath}");
+            Debug.Log("[QuickStartSceneCreator] 按 F6 或点击菜单 'MaskSystem/快速开始节奏游戏' 来运行游戏");
+        }
+
+        [MenuItem("MaskSystem/打开快速开始场景", false, 20)]
         public static void OpenQuickStartScene()
         {
             string scenePath = "Assets/Scenes/QuickStartScene.unity";
@@ -70,25 +113,44 @@ namespace Game.MaskSystem.Editor
             }
         }
 
+        [MenuItem("MaskSystem/打开节奏战斗场景", false, 21)]
+        public static void OpenRhythmBattleScene()
+        {
+            string scenePath = "Assets/Scenes/RhythmBattleScene.unity";
+            if (System.IO.File.Exists(scenePath))
+            {
+                EditorSceneManager.OpenScene(scenePath);
+            }
+            else
+            {
+                if (EditorUtility.DisplayDialog("场景不存在", "节奏战斗场景不存在，是否创建？", "创建", "取消"))
+                {
+                    CreateRhythmBattleScene();
+                }
+            }
+        }
+
         [MenuItem("MaskSystem/游戏操作说明", false, 100)]
         public static void ShowGameInstructions()
         {
             EditorUtility.DisplayDialog("游戏操作说明",
-                "【基本操作】\n" +
-                "空格键 - 在预警时按下进行反击\n" +
-                "Q/W/E - 切换不同的面具槽位\n" +
+                "【节奏模式操作】\n" +
+                "空格键 - 卡点判定（保持当前面具）\n" +
+                "Q/W/E - 切换面具并卡点判定\n" +
                 "R - 重新开始游戏\n" +
-                "P - 暂停/继续游戏\n\n" +
+                "P - 暂停/继续游戏\n" +
+                "B - 手动开始节奏战斗\n\n" +
                 "【调试功能】\n" +
                 "N - 跳过当前敌人\n" +
                 "1/2/3 - 直接跳转到对应关卡\n\n" +
-                "【游戏规则】\n" +
-                "• 敌人会自动攻击玩家\n" +
-                "• 攻击前会有红色预警提示\n" +
-                "• 在预警时按空格可以反击并造成伤害\n" +
-                "• 击败敌人可获得新面具\n" +
-                "• 不同面具之间有克制关系\n" +
-                "• 通过三个关卡即可通关",
+                "【节奏战斗规则】\n" +
+                "• 音符从右向左滚动\n" +
+                "• 在音符到达判定线时按键\n" +
+                "• Perfect(完美): ±50ms，敌人受伤\n" +
+                "• Normal(普通): ±150ms，双方都受伤\n" +
+                "• Miss(失误): 玩家受伤\n" +
+                "• 连续3次Perfect触发追加攻击！\n" +
+                "• 不同面具有不同效果（攻击/闪避/格挡/回血）",
                 "知道了");
         }
 

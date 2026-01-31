@@ -30,9 +30,10 @@ namespace Game.MaskSystem.Editor
         #region 私有字段
 
         private GameAssetsConfig _config;
+        private Rhythm.RhythmConfig _rhythmConfig;
         private Vector2 _scrollPos;
         private int _selectedTab = 0;
-        private string[] _tabNames = { "面具资源", "关卡资源", "通用资源", "快速设置" };
+        private string[] _tabNames = { "面具资源", "关卡资源", "节奏资源", "通用资源", "快速设置" };
 
         // 面具导入
         private MaskType _selectedMaskType = MaskType.Cat;
@@ -46,6 +47,15 @@ namespace Game.MaskSystem.Editor
         private Sprite _levelBackground;
         private AudioClip _levelBGM;
         private Color _levelAmbientColor = Color.white;
+
+        // 节奏资源
+        private AudioClip _beatSound;
+        private AudioClip _perfectSound;
+        private AudioClip _normalSound;
+        private AudioClip _missSound;
+        private Sprite _noteSprite;
+        private Sprite _judgeLineSprite;
+        private bool _useShaderEffects = true;
 
         // 批量导入
         private string _importFolderPath = "";
@@ -80,9 +90,12 @@ namespace Game.MaskSystem.Editor
                     DrawLevelAssetsTab();
                     break;
                 case 2:
-                    DrawCommonAssetsTab();
+                    DrawRhythmAssetsTab();
                     break;
                 case 3:
+                    DrawCommonAssetsTab();
+                    break;
+                case 4:
                     DrawQuickSetupTab();
                     break;
             }
@@ -343,6 +356,209 @@ namespace Game.MaskSystem.Editor
                 AssetDatabase.SaveAssets();
 
                 Debug.Log($"[GameAssetImporter] 保存关卡配置: {level.LevelName}");
+            }
+        }
+
+        #endregion
+
+        #region 节奏资源标签页
+
+        private void DrawRhythmAssetsTab()
+        {
+            EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+            EditorGUILayout.LabelField("节奏配置文件", EditorStyles.boldLabel);
+
+            EditorGUILayout.BeginHorizontal();
+            _rhythmConfig = (Rhythm.RhythmConfig)EditorGUILayout.ObjectField("RhythmConfig", _rhythmConfig, typeof(Rhythm.RhythmConfig), false);
+
+            if (GUILayout.Button("新建", GUILayout.Width(60)))
+            {
+                CreateNewRhythmConfig();
+            }
+
+            if (_rhythmConfig == null && GUILayout.Button("查找", GUILayout.Width(60)))
+            {
+                FindExistingRhythmConfig();
+            }
+            EditorGUILayout.EndHorizontal();
+
+            if (_rhythmConfig == null)
+            {
+                EditorGUILayout.HelpBox("请选择或创建一个 RhythmConfig 配置文件", MessageType.Warning);
+            }
+
+            EditorGUILayout.EndVertical();
+
+            EditorGUILayout.Space(10);
+
+            // 音效设置
+            EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+            EditorGUILayout.LabelField("节奏音效", EditorStyles.boldLabel);
+
+            if (_rhythmConfig != null)
+            {
+                _rhythmConfig.BeatSound = (AudioClip)EditorGUILayout.ObjectField("节拍音效", _rhythmConfig.BeatSound, typeof(AudioClip), false);
+                _rhythmConfig.PerfectSound = (AudioClip)EditorGUILayout.ObjectField("完美判定音效", _rhythmConfig.PerfectSound, typeof(AudioClip), false);
+                _rhythmConfig.NormalSound = (AudioClip)EditorGUILayout.ObjectField("普通判定音效", _rhythmConfig.NormalSound, typeof(AudioClip), false);
+                _rhythmConfig.MissSound = (AudioClip)EditorGUILayout.ObjectField("失误判定音效", _rhythmConfig.MissSound, typeof(AudioClip), false);
+            }
+            else
+            {
+                _beatSound = (AudioClip)EditorGUILayout.ObjectField("节拍音效", _beatSound, typeof(AudioClip), false);
+                _perfectSound = (AudioClip)EditorGUILayout.ObjectField("完美判定音效", _perfectSound, typeof(AudioClip), false);
+                _normalSound = (AudioClip)EditorGUILayout.ObjectField("普通判定音效", _normalSound, typeof(AudioClip), false);
+                _missSound = (AudioClip)EditorGUILayout.ObjectField("失误判定音效", _missSound, typeof(AudioClip), false);
+            }
+
+            EditorGUILayout.EndVertical();
+
+            EditorGUILayout.Space(10);
+
+            // 视觉设置
+            EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+            EditorGUILayout.LabelField("节奏视觉效果", EditorStyles.boldLabel);
+
+            _useShaderEffects = EditorGUILayout.Toggle("使用Shader特效", _useShaderEffects);
+
+            if (!_useShaderEffects)
+            {
+                EditorGUILayout.HelpBox("不使用Shader时需要提供图片资源", MessageType.Info);
+                _noteSprite = (Sprite)EditorGUILayout.ObjectField("音符图片", _noteSprite, typeof(Sprite), false);
+                _judgeLineSprite = (Sprite)EditorGUILayout.ObjectField("判定线图片", _judgeLineSprite, typeof(Sprite), false);
+            }
+            else
+            {
+                EditorGUILayout.HelpBox("将使用程序化Shader生成音符和特效:\n" +
+                    "• RhythmNoteShader - 发光脉动音符\n" +
+                    "• HitFeedbackShader - 打击反馈特效\n" +
+                    "无需额外图片资源！", MessageType.Info);
+
+                // Shader预览按钮
+                if (GUILayout.Button("预览音符Shader"))
+                {
+                    ShowShaderPreview("MaskSystem/RhythmNote");
+                }
+
+                if (GUILayout.Button("预览打击特效Shader"))
+                {
+                    ShowShaderPreview("MaskSystem/HitFeedback");
+                }
+            }
+
+            EditorGUILayout.EndVertical();
+
+            EditorGUILayout.Space(10);
+
+            // 判定参数设置
+            if (_rhythmConfig != null)
+            {
+                EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+                EditorGUILayout.LabelField("判定参数", EditorStyles.boldLabel);
+
+                _rhythmConfig.BPM = EditorGUILayout.Slider("BPM", _rhythmConfig.BPM, 60, 200);
+                _rhythmConfig.PerfectWindowMs = EditorGUILayout.Slider("完美窗口 (ms)", _rhythmConfig.PerfectWindowMs, 20, 100);
+                _rhythmConfig.NormalWindowMs = EditorGUILayout.Slider("普通窗口 (ms)", _rhythmConfig.NormalWindowMs, 100, 300);
+                _rhythmConfig.NoteTravelTime = EditorGUILayout.Slider("音符移动时间 (s)", _rhythmConfig.NoteTravelTime, 1f, 4f);
+
+                EditorGUILayout.Space(5);
+
+                // 颜色设置
+                EditorGUILayout.LabelField("判定颜色", EditorStyles.miniBoldLabel);
+                _rhythmConfig.JudgeLineColor = EditorGUILayout.ColorField("判定线颜色", _rhythmConfig.JudgeLineColor);
+                _rhythmConfig.PerfectColor = EditorGUILayout.ColorField("完美颜色", _rhythmConfig.PerfectColor);
+                _rhythmConfig.NormalColor = EditorGUILayout.ColorField("普通颜色", _rhythmConfig.NormalColor);
+                _rhythmConfig.MissColor = EditorGUILayout.ColorField("失误颜色", _rhythmConfig.MissColor);
+
+                EditorGUILayout.EndVertical();
+            }
+
+            EditorGUILayout.Space(10);
+
+            // 保存按钮
+            if (GUILayout.Button("保存节奏配置", GUILayout.Height(30)))
+            {
+                SaveRhythmConfig();
+            }
+
+            // 快速测试
+            EditorGUILayout.Space(10);
+            EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+            EditorGUILayout.LabelField("快速测试", EditorStyles.boldLabel);
+
+            if (GUILayout.Button("创建并运行节奏战斗场景"))
+            {
+                QuickStartSceneCreator.QuickStartRhythmGame();
+            }
+
+            EditorGUILayout.HelpBox(
+                "节奏战斗操作说明:\n" +
+                "• 空格键 - 卡点判定（保持当前面具）\n" +
+                "• Q/W/E - 切换面具并卡点判定\n" +
+                "• 音符从右向左滚动\n" +
+                "• Perfect: ±50ms, Normal: ±150ms, Miss: >150ms\n" +
+                "• 3次连续Perfect触发追加攻击！",
+                MessageType.None);
+
+            EditorGUILayout.EndVertical();
+        }
+
+        private void CreateNewRhythmConfig()
+        {
+            string path = EditorUtility.SaveFilePanelInProject(
+                "创建节奏配置文件",
+                "RhythmConfig",
+                "asset",
+                "选择保存位置");
+
+            if (!string.IsNullOrEmpty(path))
+            {
+                var config = Rhythm.RhythmConfig.CreateDefault();
+                AssetDatabase.CreateAsset(config, path);
+                AssetDatabase.SaveAssets();
+                _rhythmConfig = config;
+                Selection.activeObject = config;
+            }
+        }
+
+        private void FindExistingRhythmConfig()
+        {
+            string[] guids = AssetDatabase.FindAssets("t:RhythmConfig");
+            if (guids.Length > 0)
+            {
+                string path = AssetDatabase.GUIDToAssetPath(guids[0]);
+                _rhythmConfig = AssetDatabase.LoadAssetAtPath<Rhythm.RhythmConfig>(path);
+            }
+            else
+            {
+                EditorUtility.DisplayDialog("未找到", "项目中没有找到 RhythmConfig 文件", "确定");
+            }
+        }
+
+        private void ShowShaderPreview(string shaderName)
+        {
+            Shader shader = Shader.Find(shaderName);
+            if (shader != null)
+            {
+                Selection.activeObject = shader;
+                EditorGUIUtility.PingObject(shader);
+            }
+            else
+            {
+                EditorUtility.DisplayDialog("未找到", $"Shader '{shaderName}' 未找到", "确定");
+            }
+        }
+
+        private void SaveRhythmConfig()
+        {
+            if (_rhythmConfig != null)
+            {
+                EditorUtility.SetDirty(_rhythmConfig);
+                AssetDatabase.SaveAssets();
+                Debug.Log("[GameAssetImporter] 保存节奏配置");
+            }
+            else
+            {
+                EditorUtility.DisplayDialog("错误", "请先选择或创建节奏配置文件", "确定");
             }
         }
 

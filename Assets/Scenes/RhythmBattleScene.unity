@@ -122,7 +122,7 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
---- !u!1 &268266798
+--- !u!1 &960274548
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -130,39 +130,42 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 268266800}
-  - component: {fileID: 268266799}
+  - component: {fileID: 960274550}
+  - component: {fileID: 960274549}
   m_Layer: 0
-  m_Name: GameManager
+  m_Name: RhythmGameManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &268266799
+--- !u!114 &960274549
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 268266798}
+  m_GameObject: {fileID: 960274548}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 14a19ff0d51282d45a9ba3b677d4b5f0, type: 3}
+  m_Script: {fileID: 11500000, guid: d69d885ac39c9dd46b46bba9ea2db18d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   campaignMode: 1
   startLevelIndex: 0
+  bpm: 120
+  notesPerWave: 12
   characterScale: 2
   playerXPosition: -3
   enemyXPosition: 3
---- !u!4 &268266800
+  trackYPosition: -3
+--- !u!4 &960274550
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 268266798}
+  m_GameObject: {fileID: 960274548}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
@@ -175,4 +178,4 @@ Transform:
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
-  - {fileID: 268266800}
+  - {fileID: 960274550}
