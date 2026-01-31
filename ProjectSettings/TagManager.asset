@@ -47,9 +47,15 @@ TagManager:
   - name: MidView
     uniqueID: 4240045893
     locked: 0
+  - name: Actor
+    uniqueID: 3160933611
+    locked: 0
   - name: LocalView
     uniqueID: 2236585627
     locked: 0
-  - name: Actor
-    uniqueID: 3160933611
+  - name: AllScreenEffect
+    uniqueID: 2184194615
+    locked: 0
+  - name: AllScreenEffectActor
+    uniqueID: 277083455
     locked: 0
