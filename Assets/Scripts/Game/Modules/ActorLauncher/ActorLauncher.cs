@@ -96,6 +96,50 @@ namespace Game
             SpawnActor();
         }
 
+        /// <summary>
+        /// 重设Prefab并重新生成Actor
+        /// </summary>
+        /// <param name="newPrefab">新的Prefab</param>
+        public void SetPrefabAndRespawn(GameObject newPrefab)
+        {
+            if (newPrefab == null)
+            {
+                Debug.LogWarning($"[ActorLauncher] {gameObject.name}: 新Prefab为空，操作取消");
+                return;
+            }
+
+            // 先销毁旧的实例
+            DestroySpawnedActor();
+
+            // 设置新的Prefab
+            prefab = newPrefab;
+            Debug.Log($"[ActorLauncher] {gameObject.name}: Prefab已重设为 '{newPrefab.name}'");
+
+            // 生成新的Actor
+            SpawnActor();
+        }
+
+        /// <summary>
+        /// 仅重设Prefab，不立即生成
+        /// </summary>
+        /// <param name="newPrefab">新的Prefab</param>
+        /// <param name="destroyCurrentInstance">是否销毁当前实例</param>
+        public void SetPrefab(GameObject newPrefab, bool destroyCurrentInstance = true)
+        {
+            if (destroyCurrentInstance)
+            {
+                DestroySpawnedActor();
+            }
+
+            prefab = newPrefab;
+            Debug.Log($"[ActorLauncher] {gameObject.name}: Prefab已重设为 '{(newPrefab != null ? newPrefab.name : "null")}'");
+        }
+
+        /// <summary>
+        /// 获取当前设置的Prefab
+        /// </summary>
+        public GameObject Prefab => prefab;
+
         void OnDestroy()
         {
             // 如果设置为子物体，销毁时不需要手动清理，会随父物体一起销毁
