@@ -5,6 +5,7 @@
 using System;
 using GameFramework.Core;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace GameFramework.UI
 {
@@ -12,6 +13,7 @@ namespace GameFramework.UI
     /// UI视图基类
     /// </summary>
     [RequireComponent(typeof(Canvas))]
+    [RequireComponent(typeof(GraphicRaycaster))]
     public abstract class UIViewBase : MonoBehaviour, IUIView
     {
         [SerializeField] protected UILayer _layer = UILayer.Normal;
@@ -165,7 +167,7 @@ namespace GameFramework.UI
         /// </summary>
         protected void CloseSelf()
         {
-            GetComp<IUIMgr>()?.Close(this);
+            GetComp<IUIMgr>()?.CloseByView(this);
         }
         
         #endregion

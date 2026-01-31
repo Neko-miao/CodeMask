@@ -2,57 +2,75 @@
 // GameFramework - UI控制器接口
 // ================================================
 
-using System;
-
 namespace GameFramework.UI
 {
     /// <summary>
-    /// UI控制器接口
+    /// UI控制器接口 - Controller是MVC的核心，持有Model和View的引用
     /// </summary>
     public interface IUIController
     {
         /// <summary>
-        /// 初始化
+        /// View 路径（用于加载 Prefab）
         /// </summary>
-        void Initialize(IUIView view, IUIModel model);
+        string ViewPath { get; }
         
         /// <summary>
-        /// 绑定事件
+        /// View 实例
         /// </summary>
-        void BindEvents();
+        IUIView View { get; }
         
         /// <summary>
-        /// 解绑事件
+        /// Model 实例
         /// </summary>
-        void UnbindEvents();
+        IUIModel Model { get; }
         
         /// <summary>
-        /// 更新视图
+        /// 是否已初始化
         /// </summary>
-        void UpdateView();
+        bool IsInitialized { get; }
         
         /// <summary>
-        /// 清理
+        /// 初始化 Controller（由 UIMgr 调用，传入加载的 View）
         /// </summary>
-        void Clear();
+        void Initialize(IUIView view);
+        
+        /// <summary>
+        /// 打开 UI
+        /// </summary>
+        void Open(object data = null);
+        
+        /// <summary>
+        /// 关闭 UI
+        /// </summary>
+        void Close();
+        
+        /// <summary>
+        /// 刷新视图
+        /// </summary>
+        void Refresh();
+        
+        /// <summary>
+        /// 销毁 Controller 及其持有的 Model 和 View
+        /// </summary>
+        void Destroy();
     }
     
     /// <summary>
     /// UI控制器接口 (泛型)
     /// </summary>
     public interface IUIController<TView, TModel> : IUIController 
-        where TView : IUIView 
-        where TModel : IUIModel
+        where TView : class, IUIView 
+        where TModel : class, IUIModel
     {
         /// <summary>
-        /// 视图
+        /// 强类型视图
         /// </summary>
-        TView View { get; }
+        new TView View { get; }
         
         /// <summary>
-        /// 数据模型
+        /// 强类型数据模型
         /// </summary>
-        TModel Model { get; }
+        new TModel Model { get; }
     }
 }
 

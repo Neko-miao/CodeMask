@@ -3,7 +3,7 @@
 // ================================================
 
 using System;
-using System.Threading.Tasks;
+using UnityEngine;
 using GameFramework.Core;
 
 namespace GameFramework.Session
@@ -60,9 +60,9 @@ namespace GameFramework.Session
         #region Session Control
         
         /// <summary>
-        /// 开始单局
+        /// 开始单局 (协程)
         /// </summary>
-        Task StartSession(SessionConfig config);
+        Coroutine StartSession(SessionConfig config, Action onComplete = null);
         
         /// <summary>
         /// 结束单局
@@ -80,38 +80,38 @@ namespace GameFramework.Session
         void ResumeSession();
         
         /// <summary>
-        /// 重新开始单局
+        /// 重新开始单局 (协程)
         /// </summary>
-        Task RestartSession();
+        Coroutine RestartSession(Action onComplete = null);
         
         #endregion
         
         #region Level Control
         
         /// <summary>
-        /// 加载关卡
+        /// 加载关卡 (协程)
         /// </summary>
-        Task LoadLevel(int levelId);
+        Coroutine LoadLevel(int levelId, Action onComplete = null);
         
         /// <summary>
-        /// 加载关卡
+        /// 加载关卡 (协程)
         /// </summary>
-        Task LoadLevel(string levelName);
+        Coroutine LoadLevel(string levelName, Action onComplete = null);
         
         /// <summary>
-        /// 重新加载当前关卡
+        /// 重新加载当前关卡 (协程)
         /// </summary>
-        Task ReloadCurrentLevel();
+        Coroutine ReloadCurrentLevel(Action onComplete = null);
         
         /// <summary>
-        /// 下一关
+        /// 下一关 (协程)
         /// </summary>
-        Task NextLevel();
+        Coroutine NextLevel(Action onComplete = null);
         
         /// <summary>
-        /// 上一关
+        /// 上一关 (协程)
         /// </summary>
-        Task PreviousLevel();
+        Coroutine PreviousLevel(Action onComplete = null);
         
         /// <summary>
         /// 获取关卡进度
@@ -179,4 +179,3 @@ namespace GameFramework.Session
         #endregion
     }
 }
-

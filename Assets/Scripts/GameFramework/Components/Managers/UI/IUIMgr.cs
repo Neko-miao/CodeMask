@@ -4,7 +4,7 @@
 
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
+using UnityEngine;
 using GameFramework.Core;
 
 namespace GameFramework.UI
@@ -14,27 +14,51 @@ namespace GameFramework.UI
     /// </summary>
     public interface IUIMgr : IGameComponent
     {
-        #region Open/Close
+        #region Properties
         
         /// <summary>
-        /// 打开界面
+        /// UI 相机
         /// </summary>
-        T Open<T>(object data = null) where T : class, IUIView;
+        Camera UICamera { get; }
         
         /// <summary>
-        /// 打开界面 (异步)
+        /// UI 根节点
         /// </summary>
-        Task<T> OpenAsync<T>(object data = null) where T : class, IUIView;
+        Transform UIRoot { get; }
         
         /// <summary>
-        /// 关闭界面
+        /// 根 Canvas
         /// </summary>
-        void Close<T>() where T : class, IUIView;
+        Canvas RootCanvas { get; }
+        
+        #endregion
+        
+        #region Open/Close (Controller-Based)
         
         /// <summary>
-        /// 关闭界面
+        /// 打开界面（以 Controller 为核心）
         /// </summary>
-        void Close(IUIView view);
+        TController Open<TController>(object data = null) where TController : class, IUIController, new();
+        
+        /// <summary>
+        /// 打开界面 (协程)
+        /// </summary>
+        Coroutine OpenAsync<TController>(Action<TController> onComplete, object data = null) where TController : class, IUIController, new();
+        
+        /// <summary>
+        /// 关闭界面（通过 Controller 类型）
+        /// </summary>
+        void Close<TController>() where TController : class, IUIController;
+        
+        /// <summary>
+        /// 关闭界面（通过 Controller 实例）
+        /// </summary>
+        void Close(IUIController controller);
+        
+        /// <summary>
+        /// 关闭界面（通过 View 实例）
+        /// </summary>
+        void CloseByView(IUIView view);
         
         /// <summary>
         /// 关闭所有界面
@@ -46,34 +70,34 @@ namespace GameFramework.UI
         #region Query
         
         /// <summary>
-        /// 获取界面实例
+        /// 获取 Controller 实例
         /// </summary>
-        T Get<T>() where T : class, IUIView;
+        TController Get<TController>() where TController : class, IUIController;
         
         /// <summary>
-        /// 尝试获取界面实例
+        /// 尝试获取 Controller 实例
         /// </summary>
-        bool TryGet<T>(out T view) where T : class, IUIView;
+        bool TryGet<TController>(out TController controller) where TController : class, IUIController;
         
         /// <summary>
-        /// 检查界面是否打开
+        /// 检查界面是否打开（通过 Controller 类型）
         /// </summary>
-        bool IsOpen<T>() where T : class, IUIView;
+        bool IsOpen<TController>() where TController : class, IUIController;
         
         /// <summary>
-        /// 检查界面是否打开
+        /// 检查界面是否打开（通过 Controller 实例）
         /// </summary>
-        bool IsOpen(IUIView view);
+        bool IsOpen(IUIController controller);
         
         /// <summary>
-        /// 获取指定层级的所有界面
+        /// 获取指定层级的所有 Controller
         /// </summary>
-        IReadOnlyList<IUIView> GetViewsByLayer(UILayer layer);
+        IReadOnlyList<IUIController> GetControllersByLayer(UILayer layer);
         
         /// <summary>
-        /// 获取所有打开的界面
+        /// 获取所有打开的 Controller
         /// </summary>
-        IReadOnlyList<IUIView> GetAllOpenViews();
+        IReadOnlyList<IUIController> GetAllOpenControllers();
         
         #endregion
         
@@ -94,30 +118,29 @@ namespace GameFramework.UI
         #region Preload
         
         /// <summary>
-        /// 预加载界面
+        /// 预加载界面 (协程)
         /// </summary>
-        Task PreloadAsync<T>() where T : class, IUIView;
+        Coroutine PreloadAsync<TController>(Action onComplete = null) where TController : class, IUIController, new();
         
         /// <summary>
-        /// 预加载界面
+        /// 预加载界面 (协程)
         /// </summary>
-        Task PreloadAsync(string viewPath);
+        Coroutine PreloadAsync(string viewPath, Action onComplete = null);
         
         #endregion
         
         #region Events
         
         /// <summary>
-        /// 界面打开事件
+        /// Controller 打开事件
         /// </summary>
-        event Action<IUIView> OnViewOpened;
+        event Action<IUIController> OnControllerOpened;
         
         /// <summary>
-        /// 界面关闭事件
+        /// Controller 关闭事件
         /// </summary>
-        event Action<IUIView> OnViewClosed;
+        event Action<IUIController> OnControllerClosed;
         
         #endregion
     }
 }
-

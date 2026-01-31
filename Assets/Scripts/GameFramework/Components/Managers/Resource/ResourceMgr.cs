@@ -3,8 +3,8 @@
 // ================================================
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using GameFramework.Core;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -18,7 +18,8 @@ namespace GameFramework.Components
     public class ResourceMgr : GameComponent, IResourceMgr
     {
         private readonly Dictionary<string, Object> _cache = new Dictionary<string, Object>();
-        private readonly Dictionary<string, Task<Object>> _loadingTasks = new Dictionary<string, Task<Object>>();
+        private readonly HashSet<string> _loadingPaths = new HashSet<string>();
+        private readonly Dictionary<string, List<Action<Object>>> _loadingCallbacks = new Dictionary<string, List<Action<Object>>>();
         private float _loadProgress = 1f;
         
         public override string ComponentName => "ResourceMgr";
@@ -30,64 +31,91 @@ namespace GameFramework.Components
         /// </summary>
         public int CachedCount => _cache.Count;
         
+        #region Lifecycle
+        
+        protected override void OnShutdown()
+        {
+            ClearCache();
+        }
+        
+        #endregion
+        
         #region Load
         
         /// <summary>
-        /// 异步加载资源
+        /// 异步加载资源 (协程)
         /// </summary>
-        public async Task<T> LoadAsync<T>(string path) where T : Object
+        public Coroutine LoadAsync<T>(string path, Action<T> onComplete) where T : Object
+        {
+            return GameInstance.Instance.RunCoroutine(LoadAsyncCoroutine(path, onComplete));
+        }
+        
+        private IEnumerator LoadAsyncCoroutine<T>(string path, Action<T> onComplete) where T : Object
         {
             if (string.IsNullOrEmpty(path))
             {
                 Debug.LogWarning("[ResourceMgr] Path is null or empty");
-                return null;
+                onComplete?.Invoke(null);
+                yield break;
             }
             
             // 检查缓存
             if (_cache.TryGetValue(path, out var cached))
             {
-                return cached as T;
+                onComplete?.Invoke(cached as T);
+                yield break;
             }
             
             // 检查是否正在加载
-            if (_loadingTasks.TryGetValue(path, out var loadingTask))
+            if (_loadingPaths.Contains(path))
             {
-                var result = await loadingTask;
-                return result as T;
+                // 添加回调到等待列表
+                if (!_loadingCallbacks.TryGetValue(path, out var callbacks))
+                {
+                    callbacks = new List<Action<Object>>();
+                    _loadingCallbacks[path] = callbacks;
+                }
+                callbacks.Add(obj => onComplete?.Invoke(obj as T));
+                
+                // 等待加载完成
+                while (_loadingPaths.Contains(path))
+                {
+                    yield return null;
+                }
+                yield break;
             }
+            
+            // 标记为正在加载
+            _loadingPaths.Add(path);
             
             // 开始加载
             var request = Resources.LoadAsync<T>(path);
-            var tcs = new TaskCompletionSource<Object>();
+            yield return request;
             
-            _loadingTasks[path] = tcs.Task;
-            
-            request.completed += _ =>
+            var asset = request.asset;
+            if (asset != null)
             {
-                var asset = request.asset;
-                if (asset != null)
-                {
-                    _cache[path] = asset;
-                }
-                else
-                {
-                    Debug.LogWarning($"[ResourceMgr] Failed to load resource: {path}");
-                }
-                
-                _loadingTasks.Remove(path);
-                tcs.SetResult(asset);
-            };
+                _cache[path] = asset;
+            }
+            else
+            {
+                Debug.LogWarning($"[ResourceMgr] Failed to load resource: {path}");
+            }
             
-            return await tcs.Task as T;
-        }
-        
-        /// <summary>
-        /// 异步加载资源 (带回调)
-        /// </summary>
-        public async void LoadAsync<T>(string path, Action<T> onComplete) where T : Object
-        {
-            var result = await LoadAsync<T>(path);
-            onComplete?.Invoke(result);
+            // 移除加载状态
+            _loadingPaths.Remove(path);
+            
+            // 触发所有等待的回调
+            if (_loadingCallbacks.TryGetValue(path, out var waitingCallbacks))
+            {
+                foreach (var callback in waitingCallbacks)
+                {
+                    callback?.Invoke(asset);
+                }
+                _loadingCallbacks.Remove(path);
+            }
+            
+            onComplete?.Invoke(asset as T);
         }
         
         /// <summary>
@@ -108,8 +136,8 @@ namespace GameFramework.Components
             }
             
             // 同步加载
-            var asset = Resources.Load<T>(path);
-            
+            var asset = Resources.Load<T>(path); 
+             
             if (asset != null)
             {
                 _cache[path] = asset;
@@ -167,40 +195,45 @@ namespace GameFramework.Components
         #region Preload
         
         /// <summary>
-        /// 预加载资源
+        /// 预加载资源 (协程)
         /// </summary>
-        public Task PreloadAsync(string[] paths)
+        public Coroutine PreloadAsync(string[] paths, Action onComplete = null, Action<float> onProgress = null)
         {
-            return PreloadAsync(paths, null);
+            return GameInstance.Instance.RunCoroutine(PreloadAsyncCoroutine(paths, onComplete, onProgress));
         }
         
-        /// <summary>
-        /// 预加载资源 (带进度回调)
-        /// </summary>
-        public async Task PreloadAsync(string[] paths, Action<float> onProgress)
+        private IEnumerator PreloadAsyncCoroutine(string[] paths, Action onComplete, Action<float> onProgress)
         {
             if (paths == null || paths.Length == 0)
-                return;
+            {
+                onComplete?.Invoke();
+                yield break;
+            }
             
             _loadProgress = 0f;
             int loaded = 0;
             int total = paths.Length;
             
-            var tasks = new List<Task>();
-            
             foreach (var path in paths)
             {
-                var task = LoadAsync<Object>(path).ContinueWith(_ =>
+                bool isLoaded = false;
+                LoadAsync<Object>(path, _ =>
                 {
                     loaded++;
                     _loadProgress = (float)loaded / total;
                     onProgress?.Invoke(_loadProgress);
+                    isLoaded = true;
                 });
-                tasks.Add(task);
+                
+                // 等待当前资源加载完成
+                while (!isLoaded)
+                {
+                    yield return null;
+                }
             }
             
-            await Task.WhenAll(tasks);
             _loadProgress = 1f;
+            onComplete?.Invoke();
         }
         
         /// <summary>
@@ -246,26 +279,39 @@ namespace GameFramework.Components
         }
         
         /// <summary>
-        /// 异步实例化预制体
+        /// 异步实例化预制体 (协程)
         /// </summary>
-        public async Task<GameObject> InstantiateAsync(string prefabPath, Transform parent = null)
+        public Coroutine InstantiateAsync(string prefabPath, Action<GameObject> onComplete, Transform parent = null)
         {
-            var prefab = await LoadAsync<GameObject>(prefabPath);
-            if (prefab == null) return null;
-            
-            return Object.Instantiate(prefab, parent);
+            return GameInstance.Instance.RunCoroutine(InstantiateAsyncCoroutine(prefabPath, onComplete, parent));
         }
         
-        #endregion
-        
-        #region Lifecycle
-        
-        protected override void OnShutdown()
+        private IEnumerator InstantiateAsyncCoroutine(string prefabPath, Action<GameObject> onComplete, Transform parent)
         {
-            ClearCache();
+            GameObject prefab = null;
+            bool isLoaded = false;
+            
+            LoadAsync<GameObject>(prefabPath, result =>
+            {
+                prefab = result;
+                isLoaded = true;
+            });
+            
+            while (!isLoaded)
+            {
+                yield return null;
+            }
+            
+            if (prefab == null)
+            {
+                onComplete?.Invoke(null);
+                yield break;
+            }
+            
+            var instance = Object.Instantiate(prefab, parent);
+            onComplete?.Invoke(instance);
         }
         
         #endregion
     }
 }
-

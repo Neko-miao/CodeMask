@@ -1,7 +1,9 @@
 {
     "name": "GameFramework",
     "rootNamespace": "GameFramework",
-    "references": [],
+    "references": [
+        "Unity.ugui"
+    ],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,

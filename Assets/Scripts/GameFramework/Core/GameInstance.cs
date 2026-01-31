@@ -3,6 +3,7 @@
 // ================================================
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -462,6 +463,83 @@ namespace GameFramework.Core
         {
             var comp = _componentContainer?.Get<T>();
             comp?.SetEnabled(false);
+        }
+        
+        #endregion
+        
+        #region Coroutine Support
+        
+        /// <summary>
+        /// 启动协程
+        /// </summary>
+        public Coroutine RunCoroutine(IEnumerator routine)
+        {
+            if (routine == null) return null;
+            return StartCoroutine(routine);
+        }
+        
+        /// <summary>
+        /// 停止协程
+        /// </summary>
+        public void CancelCoroutine(Coroutine coroutine)
+        {
+            if (coroutine != null)
+            {
+                StopCoroutine(coroutine);
+            }
+        }
+        
+        /// <summary>
+        /// 停止所有协程
+        /// </summary>
+        public void CancelAllCoroutines()
+        {
+            StopAllCoroutines();
+        }
+        
+        /// <summary>
+        /// 延迟执行
+        /// </summary>
+        public Coroutine DelayCall(float delay, Action callback)
+        {
+            if (callback == null) return null;
+            return StartCoroutine(DelayCallCoroutine(delay, callback));
+        }
+        
+        private IEnumerator DelayCallCoroutine(float delay, Action callback)
+        {
+            yield return new WaitForSeconds(delay);
+            callback?.Invoke();
+        }
+        
+        /// <summary>
+        /// 延迟一帧执行
+        /// </summary>
+        public Coroutine DelayFrame(Action callback)
+        {
+            if (callback == null) return null;
+            return StartCoroutine(DelayFrameCoroutine(callback));
+        }
+        
+        private IEnumerator DelayFrameCoroutine(Action callback)
+        {
+            yield return null;
+            callback?.Invoke();
+        }
+        
+        /// <summary>
+        /// 等待直到条件为真
+        /// </summary>
+        public Coroutine WaitUntil(Func<bool> condition, Action callback)
+        {
+            if (condition == null || callback == null) return null;
+            return StartCoroutine(WaitUntilCoroutine(condition, callback));
+        }
+        
+        private IEnumerator WaitUntilCoroutine(Func<bool> condition, Action callback)
+        {
+            yield return new WaitUntil(condition);
+            callback?.Invoke();
         }
         
         #endregion

@@ -4,7 +4,7 @@
 
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
+using UnityEngine;
 
 namespace GameFramework.Session
 {
@@ -45,14 +45,14 @@ namespace GameFramework.Session
         #region Level Operations
         
         /// <summary>
-        /// 加载关卡
+        /// 加载关卡 (协程)
         /// </summary>
-        Task LoadLevel(int levelId);
+        Coroutine LoadLevel(int levelId, Action onComplete = null);
         
         /// <summary>
-        /// 加载关卡
+        /// 加载关卡 (协程)
         /// </summary>
-        Task LoadLevel(ILevelConfig config);
+        Coroutine LoadLevel(ILevelConfig config, Action onComplete = null);
         
         /// <summary>
         /// 卸载当前关卡
@@ -60,9 +60,9 @@ namespace GameFramework.Session
         void UnloadCurrentLevel();
         
         /// <summary>
-        /// 重新加载关卡
+        /// 重新加载关卡 (协程)
         /// </summary>
-        Task ReloadLevel();
+        Coroutine ReloadLevel(Action onComplete = null);
         
         /// <summary>
         /// 开始当前关卡
@@ -178,4 +178,3 @@ namespace GameFramework.Session
         #endregion
     }
 }
-

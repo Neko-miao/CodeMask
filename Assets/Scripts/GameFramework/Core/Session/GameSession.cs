@@ -3,8 +3,8 @@
 // ================================================
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using GameFramework.Core;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -93,12 +93,18 @@ namespace GameFramework.Session
         
         #region Session Control
         
-        public async Task StartSession(SessionConfig config)
+        public Coroutine StartSession(SessionConfig config, Action onComplete = null)
+        {
+            return GameInstance.Instance.RunCoroutine(StartSessionCoroutine(config, onComplete));
+        }
+        
+        private IEnumerator StartSessionCoroutine(SessionConfig config, Action onComplete)
         {
             if (_state != SessionState.None && _state != SessionState.Ended)
             {
                 Debug.LogWarning("[GameSession] Session already in progress");
-                return;
+                onComplete?.Invoke();
+                yield break;
             }
             
             Debug.Log("[GameSession] Starting session...");
@@ -125,7 +131,13 @@ namespace GameFramework.Session
             // 加载起始关卡
             if (config.AutoStartLevel)
             {
-                await LoadLevel(config.StartLevelId);
+                bool isLoaded = false;
+                _levelMgr.LoadLevel(config.StartLevelId, () => isLoaded = true);
+                
+                while (!isLoaded)
+                {
+                    yield return null;
+                }
             }
             
             // 启动规则
@@ -134,6 +146,7 @@ namespace GameFramework.Session
             ChangeState(SessionState.Running);
             
             Debug.Log("[GameSession] Session started");
+            onComplete?.Invoke();
         }
         
         public void EndSession(SessionEndReason reason)
@@ -186,12 +199,18 @@ namespace GameFramework.Session
             Debug.Log("[GameSession] Session resumed");
         }
         
-        public async Task RestartSession()
+        public Coroutine RestartSession(Action onComplete = null)
+        {
+            return GameInstance.Instance.RunCoroutine(RestartSessionCoroutine(onComplete));
+        }
+        
+        private IEnumerator RestartSessionCoroutine(Action onComplete)
         {
             if (_currentConfig == null)
             {
                 Debug.LogWarning("[GameSession] No config to restart");
-                return;
+                onComplete?.Invoke();
+                yield break;
             }
             
             Debug.Log("[GameSession] Restarting session...");
@@ -202,59 +221,134 @@ namespace GameFramework.Session
             
             // 重新开始
             ChangeState(SessionState.None);
-            await StartSession(_currentConfig);
+            
+            bool isStarted = false;
+            StartSession(_currentConfig, () => isStarted = true);
+            
+            while (!isStarted)
+            {
+                yield return null;
+            }
+            
+            onComplete?.Invoke();
         }
         
         #endregion
         
         #region Level Control
         
-        public async Task LoadLevel(int levelId)
+        public Coroutine LoadLevel(int levelId, Action onComplete = null)
         {
-            await _levelMgr.LoadLevel(levelId);
-            _context.CurrentLevelId = levelId;
+            return GameInstance.Instance.RunCoroutine(LoadLevelCoroutine(levelId, onComplete));
         }
         
-        public async Task LoadLevel(string levelName)
+        private IEnumerator LoadLevelCoroutine(int levelId, Action onComplete)
+        {
+            bool isLoaded = false;
+            _levelMgr.LoadLevel(levelId, () => isLoaded = true);
+            
+            while (!isLoaded)
+            {
+                yield return null;
+            }
+            
+            _context.CurrentLevelId = levelId;
+            onComplete?.Invoke();
+        }
+        
+        public Coroutine LoadLevel(string levelName, Action onComplete = null)
+        {
+            return GameInstance.Instance.RunCoroutine(LoadLevelByNameCoroutine(levelName, onComplete));
+        }
+        
+        private IEnumerator LoadLevelByNameCoroutine(string levelName, Action onComplete)
         {
             var configs = _levelMgr.GetAllLevelConfigs();
             foreach (var config in configs)
             {
                 if (config.LevelName == levelName)
                 {
-                    await LoadLevel(config.LevelId);
-                    return;
+                    bool isLoaded = false;
+                    LoadLevel(config.LevelId, () => isLoaded = true);
+                    
+                    while (!isLoaded)
+                    {
+                        yield return null;
+                    }
+                    
+                    onComplete?.Invoke();
+                    yield break;
                 }
             }
             
             Debug.LogWarning($"[GameSession] Level not found: {levelName}");
+            onComplete?.Invoke();
         }
         
-        public async Task ReloadCurrentLevel()
+        public Coroutine ReloadCurrentLevel(Action onComplete = null)
         {
-            await _levelMgr.ReloadLevel();
+            return GameInstance.Instance.RunCoroutine(ReloadCurrentLevelCoroutine(onComplete));
         }
         
-        public async Task NextLevel()
+        private IEnumerator ReloadCurrentLevelCoroutine(Action onComplete)
+        {
+            bool isLoaded = false;
+            _levelMgr.ReloadLevel(() => isLoaded = true);
+            
+            while (!isLoaded)
+            {
+                yield return null;
+            }
+            
+            onComplete?.Invoke();
+        }
+        
+        public Coroutine NextLevel(Action onComplete = null)
+        {
+            return GameInstance.Instance.RunCoroutine(NextLevelCoroutine(onComplete));
+        }
+        
+        private IEnumerator NextLevelCoroutine(Action onComplete)
         {
             int nextLevelId = _context.CurrentLevelId + 1;
             if (_levelMgr.IsLevelUnlocked(nextLevelId))
             {
-                await LoadLevel(nextLevelId);
+                bool isLoaded = false;
+                LoadLevel(nextLevelId, () => isLoaded = true);
+                
+                while (!isLoaded)
+                {
+                    yield return null;
+                }
             }
             else
             {
                 Debug.LogWarning($"[GameSession] Level {nextLevelId} is locked");
             }
+            
+            onComplete?.Invoke();
         }
         
-        public async Task PreviousLevel()
+        public Coroutine PreviousLevel(Action onComplete = null)
+        {
+            return GameInstance.Instance.RunCoroutine(PreviousLevelCoroutine(onComplete));
+        }
+        
+        private IEnumerator PreviousLevelCoroutine(Action onComplete)
         {
             int prevLevelId = _context.CurrentLevelId - 1;
             if (prevLevelId > 0)
             {
-                await LoadLevel(prevLevelId);
+                bool isLoaded = false;
+                LoadLevel(prevLevelId, () => isLoaded = true);
+                
+                while (!isLoaded)
+                {
+                    yield return null;
+                }
             }
+            
+            onComplete?.Invoke();
         }
         
         public float GetLevelProgress()
@@ -358,7 +452,7 @@ namespace GameFramework.Session
         
         #region Level Operations
         
-        public async Task LoadLevel(int levelId)
+        public Coroutine LoadLevel(int levelId, Action onComplete = null)
         {
             if (!_levelConfigs.TryGetValue(levelId, out var config))
             {
@@ -367,12 +461,21 @@ namespace GameFramework.Session
                 RegisterLevelConfig(config);
             }
             
-            await LoadLevel(config);
+            return LoadLevel(config, onComplete);
         }
         
-        public async Task LoadLevel(ILevelConfig config)
+        public Coroutine LoadLevel(ILevelConfig config, Action onComplete = null)
         {
-            if (config == null) return;
+            return GameInstance.Instance.RunCoroutine(LoadLevelCoroutine(config, onComplete));
+        }
+        
+        private IEnumerator LoadLevelCoroutine(ILevelConfig config, Action onComplete)
+        {
+            if (config == null)
+            {
+                onComplete?.Invoke();
+                yield break;
+            }
             
             _isLoading = true;
             OnLevelLoadStart?.Invoke(config.LevelId);
@@ -387,7 +490,7 @@ namespace GameFramework.Session
                 while (!operation.isDone)
                 {
                     OnLevelLoadProgress?.Invoke(operation.progress);
-                    await Task.Yield();
+                    yield return null;
                 }
             }
             
@@ -399,6 +502,7 @@ namespace GameFramework.Session
             OnLevelLoadComplete?.Invoke(_currentLevel);
             
             Debug.Log($"[LevelMgr] Level loaded: {config.LevelId}");
+            onComplete?.Invoke();
         }
         
         public void UnloadCurrentLevel()
@@ -418,12 +522,29 @@ namespace GameFramework.Session
             OnLevelUnloaded?.Invoke(level);
         }
         
-        public async Task ReloadLevel()
+        public Coroutine ReloadLevel(Action onComplete = null)
         {
-            if (_currentLevel == null) return;
+            return GameInstance.Instance.RunCoroutine(ReloadLevelCoroutine(onComplete));
+        }
+        
+        private IEnumerator ReloadLevelCoroutine(Action onComplete)
+        {
+            if (_currentLevel == null)
+            {
+                onComplete?.Invoke();
+                yield break;
+            }
             
             int levelId = _currentLevel.LevelId;
-            await LoadLevel(levelId);
+            bool isLoaded = false;
+            LoadLevel(levelId, () => isLoaded = true);
+            
+            while (!isLoaded)
+            {
+                yield return null;
+            }
+            
+            onComplete?.Invoke();
         }
         
         public void StartLevel()
@@ -554,4 +675,3 @@ namespace GameFramework.Session
         }
     }
 }
-

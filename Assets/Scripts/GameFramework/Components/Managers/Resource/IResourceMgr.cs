@@ -3,9 +3,8 @@
 // ================================================
 
 using System;
-using System.Threading.Tasks;
-using GameFramework.Core;
 using UnityEngine;
+using GameFramework.Core;
 
 namespace GameFramework.Components
 {
@@ -15,14 +14,9 @@ namespace GameFramework.Components
     public interface IResourceMgr : IGameComponent
     {
         /// <summary>
-        /// 异步加载资源
+        /// 异步加载资源 (协程)
         /// </summary>
-        Task<T> LoadAsync<T>(string path) where T : UnityEngine.Object;
-        
-        /// <summary>
-        /// 异步加载资源 (带回调)
-        /// </summary>
-        void LoadAsync<T>(string path, Action<T> onComplete) where T : UnityEngine.Object;
+        Coroutine LoadAsync<T>(string path, Action<T> onComplete) where T : UnityEngine.Object;
         
         /// <summary>
         /// 同步加载资源
@@ -40,14 +34,9 @@ namespace GameFramework.Components
         void UnloadUnused();
         
         /// <summary>
-        /// 预加载资源
+        /// 预加载资源 (协程)
         /// </summary>
-        Task PreloadAsync(string[] paths);
-        
-        /// <summary>
-        /// 预加载资源 (带进度回调)
-        /// </summary>
-        Task PreloadAsync(string[] paths, Action<float> onProgress);
+        Coroutine PreloadAsync(string[] paths, Action onComplete = null, Action<float> onProgress = null);
         
         /// <summary>
         /// 获取加载进度
@@ -80,9 +69,8 @@ namespace GameFramework.Components
         GameObject Instantiate(string prefabPath, Vector3 position, Quaternion rotation, Transform parent = null);
         
         /// <summary>
-        /// 异步实例化预制体
+        /// 异步实例化预制体 (协程)
         /// </summary>
-        Task<GameObject> InstantiateAsync(string prefabPath, Transform parent = null);
+        Coroutine InstantiateAsync(string prefabPath, Action<GameObject> onComplete, Transform parent = null);
     }
 }
-

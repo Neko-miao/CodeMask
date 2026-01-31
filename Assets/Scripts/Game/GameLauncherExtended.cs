@@ -4,6 +4,7 @@
 
 using GameFramework.Core;
 using Game.Modules;
+using Game.States;
 using UnityEngine;
 
 namespace Game
@@ -19,6 +20,9 @@ namespace Game
         protected override void RegisterCustomComponents(IComponentRegistry registry)
         {
             base.RegisterCustomComponents(registry);
+            
+            // 注册游戏状态管理器 (全局)
+            registry.RegisterGlobal<IGameStateMgr, GameStateMgr>(priority: 80);
             
             // 注册玩家模块
             registry.RegisterForState<IPlayerMdl, PlayerMdl>(GameState.Playing, priority: 200);
