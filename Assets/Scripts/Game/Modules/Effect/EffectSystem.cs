@@ -42,6 +42,8 @@ namespace Game
 
         #endregion
 
+        public GameObject attackEff;
+
         [Header("全屏特效设置")]
         [Tooltip("全屏闪烁特效 SpriteRenderer")]
         [SerializeField]
@@ -65,6 +67,15 @@ namespace Game
         [SerializeField]
         private float shakeFrequency = 30f;
 
+        [Header("攻击特效设置")]
+        [Tooltip("攻击特效移动时间（秒）")]
+        [SerializeField]
+        private float attackEffectMoveTime = 0.1f;
+
+        [Tooltip("攻击特效存活时间（秒）")]
+        [SerializeField]
+        private float attackEffectLifeTime = 0.25f;
+
         [Header("测试设置")]
         [Tooltip("测试用SpriteRenderer列表")]
         [SerializeField]
@@ -81,6 +92,15 @@ namespace Game
         [Tooltip("是否启用测试")]
         [SerializeField]
         private bool enableTest = true;
+
+        [Header("攻击特效测试")]
+        [Tooltip("攻击特效测试起始点")]
+        [SerializeField]
+        private Transform testAttackStartPoint;
+
+        [Tooltip("攻击特效测试目标点")]
+        [SerializeField]
+        private Transform testAttackTargetPoint;
 
         /// <summary>
         /// 当前特效协程
@@ -230,6 +250,12 @@ namespace Game
             if (enableTest && Input.GetKeyDown(KeyCode.Y))
             {
                 TestTimeStop();
+            }
+
+            // 按S键触发攻击特效测试
+            if (enableTest && Input.GetKeyDown(KeyCode.S))
+            {
+                TestAttackEffect();
             }
         }
 
@@ -614,6 +640,73 @@ namespace Game
 
         #endregion
 
+        #region Attack Effect
+
+        /// <summary>
+        /// 播放攻击特效
+        /// </summary>
+        /// <param name="startPosition">起始位置</param>
+        /// <param name="targetPosition">目标位置</param>
+        public void PlayAttackEffect(Vector3 startPosition, Vector3 targetPosition)
+        {
+            if (attackEff == null)
+            {
+                Debug.LogWarning("[EffectSystem] attackEff预制体未设置");
+                return;
+            }
+
+            StartCoroutine(AttackEffectCoroutine(startPosition, targetPosition));
+        }
+
+        /// <summary>
+        /// 攻击特效协程
+        /// </summary>
+        private IEnumerator AttackEffectCoroutine(Vector3 startPosition, Vector3 targetPosition)
+        {
+            // 在起始点生成特效
+            GameObject effectInstance = Instantiate(attackEff, startPosition, Quaternion.identity);
+
+            // 确保特效开启
+            effectInstance.SetActive(true);
+
+            // 计算方向并让Y轴朝向目标点
+            Vector3 direction = (targetPosition - startPosition).normalized;
+            if (direction != Vector3.zero)
+            {
+                // 计算让Y轴（上方向）朝向目标点的旋转
+                float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg - 90f;
+                effectInstance.transform.rotation = Quaternion.Euler(0f, 0f, angle);
+            }
+
+            // 0.1s内移动到目标点
+            float elapsed = 0f;
+            while (elapsed < attackEffectMoveTime)
+            {
+                elapsed += Time.deltaTime;
+                float t = Mathf.Clamp01(elapsed / attackEffectMoveTime);
+                effectInstance.transform.position = Vector3.Lerp(startPosition, targetPosition, t);
+                yield return null;
+            }
+
+            // 确保到达目标点
+            effectInstance.transform.position = targetPosition;
+
+            // 等待剩余时间后销毁 (0.25s - 0.1s = 0.15s)
+            float remainingTime = attackEffectLifeTime - attackEffectMoveTime;
+            if (remainingTime > 0f)
+            {
+                yield return new WaitForSeconds(remainingTime);
+            }
+
+            // 销毁特效
+            if (effectInstance != null)
+            {
+                Destroy(effectInstance);
+            }
+        }
+
+        #endregion
+
         #region Test Methods
 
         /// <summary>
@@ -653,6 +746,21 @@ namespace Game
         {
             Debug.Log($"[EffectSystem] 测试时停特效，持续 {testDuration} 秒");
             PlayTimeStop(testDuration, testExcludedObjects.ToArray());
+        }
+
+        /// <summary>
+        /// 测试攻击特效
+        /// </summary>
+        public void TestAttackEffect()
+        {
+            if (testAttackStartPoint == null || testAttackTargetPoint == null)
+            {
+                Debug.LogWarning("[EffectSystem] 请在Inspector中设置攻击特效测试的起始点和目标点");
+                return;
+            }
+
+            Debug.Log($"[EffectSystem] 测试攻击特效，从 {testAttackStartPoint.position} 到 {testAttackTargetPoint.position}");
+            PlayAttackEffect(testAttackStartPoint.position, testAttackTargetPoint.position);
         }
 
         #endregion
