@@ -1,0 +1,174 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0bed302176d057a4688867d0feb88c0e, type: 3}
+  m_Name: GameAssetsConfig
+  m_EditorClassIdentifier: 
+  _maskVisuals:
+  - Type: 1
+    DisplayName: 
+    Icon: {fileID: 0}
+    CharacterSprite: {fileID: 0}
+    MaskSprite: {fileID: 0}
+    ThemeColor: {r: 1, g: 0.8, b: 0.4, a: 1}
+    GlowColor: {r: 1, g: 0.8, b: 0.4, a: 1}
+    BackgroundColor: {r: 0.2, g: 0.2, b: 0.2, a: 0.8}
+    AttackEffect: {fileID: 0}
+    HitEffect: {fileID: 0}
+    SwitchEffect: {fileID: 0}
+    IdleAnimator: {fileID: 0}
+    AttackAnimator: {fileID: 0}
+  - Type: 2
+    DisplayName: 
+    Icon: {fileID: 0}
+    CharacterSprite: {fileID: 0}
+    MaskSprite: {fileID: 0}
+    ThemeColor: {r: 0.4, g: 0.8, b: 0.4, a: 1}
+    GlowColor: {r: 0.4, g: 0.8, b: 0.4, a: 1}
+    BackgroundColor: {r: 0.2, g: 0.2, b: 0.2, a: 0.8}
+    AttackEffect: {fileID: 0}
+    HitEffect: {fileID: 0}
+    SwitchEffect: {fileID: 0}
+    IdleAnimator: {fileID: 0}
+    AttackAnimator: {fileID: 0}
+  - Type: 3
+    DisplayName: 
+    Icon: {fileID: 0}
+    CharacterSprite: {fileID: 0}
+    MaskSprite: {fileID: 0}
+    ThemeColor: {r: 0.6, g: 0.4, b: 0.2, a: 1}
+    GlowColor: {r: 0.6, g: 0.4, b: 0.2, a: 1}
+    BackgroundColor: {r: 0.2, g: 0.2, b: 0.2, a: 0.8}
+    AttackEffect: {fileID: 0}
+    HitEffect: {fileID: 0}
+    SwitchEffect: {fileID: 0}
+    IdleAnimator: {fileID: 0}
+    AttackAnimator: {fileID: 0}
+  - Type: 4
+    DisplayName: 
+    Icon: {fileID: 0}
+    CharacterSprite: {fileID: 0}
+    MaskSprite: {fileID: 0}
+    ThemeColor: {r: 0.8, g: 0.6, b: 0.4, a: 1}
+    GlowColor: {r: 0.8, g: 0.6, b: 0.4, a: 1}
+    BackgroundColor: {r: 0.2, g: 0.2, b: 0.2, a: 0.8}
+    AttackEffect: {fileID: 0}
+    HitEffect: {fileID: 0}
+    SwitchEffect: {fileID: 0}
+    IdleAnimator: {fileID: 0}
+    AttackAnimator: {fileID: 0}
+  - Type: 5
+    DisplayName: 
+    Icon: {fileID: 0}
+    CharacterSprite: {fileID: 0}
+    MaskSprite: {fileID: 0}
+    ThemeColor: {r: 0.8, g: 0.2, b: 0.2, a: 1}
+    GlowColor: {r: 0.8, g: 0.2, b: 0.2, a: 1}
+    BackgroundColor: {r: 0.2, g: 0.2, b: 0.2, a: 0.8}
+    AttackEffect: {fileID: 0}
+    HitEffect: {fileID: 0}
+    SwitchEffect: {fileID: 0}
+    IdleAnimator: {fileID: 0}
+    AttackAnimator: {fileID: 0}
+  - Type: 6
+    DisplayName: 
+    Icon: {fileID: 0}
+    CharacterSprite: {fileID: 0}
+    MaskSprite: {fileID: 0}
+    ThemeColor: {r: 0.4, g: 0.6, b: 0.9, a: 1}
+    GlowColor: {r: 0.4, g: 0.6, b: 0.9, a: 1}
+    BackgroundColor: {r: 0.2, g: 0.2, b: 0.2, a: 0.8}
+    AttackEffect: {fileID: 0}
+    HitEffect: {fileID: 0}
+    SwitchEffect: {fileID: 0}
+    IdleAnimator: {fileID: 0}
+    AttackAnimator: {fileID: 0}
+  - Type: 7
+    DisplayName: 
+    Icon: {fileID: 0}
+    CharacterSprite: {fileID: 0}
+    MaskSprite: {fileID: 0}
+    ThemeColor: {r: 0.5, g: 0.5, b: 0.6, a: 1}
+    GlowColor: {r: 0.5, g: 0.5, b: 0.6, a: 1}
+    BackgroundColor: {r: 0.2, g: 0.2, b: 0.2, a: 0.8}
+    AttackEffect: {fileID: 0}
+    HitEffect: {fileID: 0}
+    SwitchEffect: {fileID: 0}
+    IdleAnimator: {fileID: 0}
+    AttackAnimator: {fileID: 0}
+  - Type: 8
+    DisplayName: 
+    Icon: {fileID: 0}
+    CharacterSprite: {fileID: 0}
+    MaskSprite: {fileID: 0}
+    ThemeColor: {r: 0.9, g: 0.3, b: 0.9, a: 1}
+    GlowColor: {r: 0.9, g: 0.3, b: 0.9, a: 1}
+    BackgroundColor: {r: 0.2, g: 0.2, b: 0.2, a: 0.8}
+    AttackEffect: {fileID: 0}
+    HitEffect: {fileID: 0}
+    SwitchEffect: {fileID: 0}
+    IdleAnimator: {fileID: 0}
+    AttackAnimator: {fileID: 0}
+  _levelVisuals:
+  - LevelName: "\u5FEB\u4E50\u68EE\u6797"
+    Description: "\u6B22\u5FEB\u3001\u8BD9\u8C10\u7684\u68EE\u6797\u5173\u5361"
+    Background: {fileID: 0}
+    BackgroundColor: {r: 0.2, g: 0.4, b: 0.2, a: 1}
+    ForegroundDecor: {fileID: 0}
+    AmbientColor: {r: 1, g: 1, b: 0.9, a: 1}
+    FogColor: {r: 0.3, g: 0.5, b: 0.3, a: 0.2}
+    AmbientParticles: {fileID: 0}
+    BGM: {fileID: 0}
+    AmbientSound: {fileID: 0}
+    BGMVolume: 0.7
+    TitleImage: {fileID: 0}
+    TransitionColor: {r: 0.1, g: 0.3, b: 0.1, a: 1}
+  - LevelName: "\u6DF1\u6D77"
+    Description: "\u5FE7\u4F24\u3001\u5B64\u5BC2\u3001\u6C89\u91CD\u7684\u54C0\u4F24"
+    Background: {fileID: 0}
+    BackgroundColor: {r: 0.05, g: 0.1, b: 0.3, a: 1}
+    ForegroundDecor: {fileID: 0}
+    AmbientColor: {r: 0.6, g: 0.7, b: 1, a: 1}
+    FogColor: {r: 0.1, g: 0.2, b: 0.4, a: 0.4}
+    AmbientParticles: {fileID: 0}
+    BGM: {fileID: 0}
+    AmbientSound: {fileID: 0}
+    BGMVolume: 0.6
+    TitleImage: {fileID: 0}
+    TransitionColor: {r: 0.02, g: 0.05, b: 0.15, a: 1}
+  - LevelName: "\u5929\u7A7A"
+    Description: "\u6700\u7EC8Boss - \u9F99"
+    Background: {fileID: 0}
+    BackgroundColor: {r: 0.4, g: 0.3, b: 0.5, a: 1}
+    ForegroundDecor: {fileID: 0}
+    AmbientColor: {r: 1, g: 0.9, b: 1, a: 1}
+    FogColor: {r: 0.5, g: 0.4, b: 0.6, a: 0.3}
+    AmbientParticles: {fileID: 0}
+    BGM: {fileID: 0}
+    AmbientSound: {fileID: 0}
+    BGMVolume: 0.8
+    TitleImage: {fileID: 0}
+    TransitionColor: {r: 0.2, g: 0.1, b: 0.3, a: 1}
+  HealthBarFill: {fileID: 0}
+  HealthBarBackground: {fileID: 0}
+  WarningBarFill: {fileID: 0}
+  MaskSlotBackground: {fileID: 0}
+  MaskSlotSelected: {fileID: 0}
+  DefaultHitEffect: {fileID: 0}
+  HealEffect: {fileID: 0}
+  LevelUpEffect: {fileID: 0}
+  AttackSound: {fileID: 0}
+  HitSound: {fileID: 0}
+  SwitchMaskSound: {fileID: 0}
+  VictorySound: {fileID: 0}
+  DefeatSound: {fileID: 0}
+  MainFont: {fileID: 0}
+  NumberFont: {fileID: 0}
