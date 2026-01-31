@@ -4,6 +4,7 @@ namespace Game
 {
     /// <summary>
     /// 节奏物体 - 挂载在节奏Prefab上，负责向左移动
+    /// 使用纯距离计算，不依赖物理组件
     /// </summary>
     public class Rhythm : MonoBehaviour
     {
@@ -21,6 +22,11 @@ namespace Game
         /// 行为类型
         /// </summary>
         private RhythmActionType actionType;
+
+        /// <summary>
+        /// 面具类型
+        /// </summary>
+        private MaskType maskType = MaskType.None;
 
         #region Properties
 
@@ -43,6 +49,16 @@ namespace Game
         /// </summary>
         public RhythmActionType ActionType => actionType;
 
+        /// <summary>
+        /// 面具类型
+        /// </summary>
+        public MaskType MaskType => maskType;
+
+        /// <summary>
+        /// 当前X位置
+        /// </summary>
+        public float PositionX => transform.position.x;
+
         #endregion
 
         /// <summary>
@@ -52,8 +68,20 @@ namespace Game
         /// <param name="type">行为类型</param>
         public void Initialize(float speed, RhythmActionType type)
         {
+            Initialize(speed, type, MaskType.None);
+        }
+
+        /// <summary>
+        /// 初始化节奏物体（带面具类型）
+        /// </summary>
+        /// <param name="speed">移动速度</param>
+        /// <param name="type">行为类型</param>
+        /// <param name="mask">面具类型</param>
+        public void Initialize(float speed, RhythmActionType type, MaskType mask)
+        {
             moveSpeed = speed;
             actionType = type;
+            maskType = mask;
             isMoving = true;
         }
 
