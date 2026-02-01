@@ -5,9 +5,11 @@
 using GameFramework.Core;
 using GameFramework.UI;
 using GameFramework.Session;
+using GameFramework.Components;
 using Game.UI;
 using Game.Battle;
 using Game.Modules;
+using GameConfigs;
 using UnityEngine;
 
 namespace Game.States
@@ -42,6 +44,9 @@ namespace Game.States
         public void OnExit()
         {
             Debug.Log("[InGameStateHandler] Exiting InGame State");
+            
+            // 停止背景音乐
+            StopBackgroundMusic();
             
             // 销毁主玩家
             DestroyMainPlayer();
@@ -81,6 +86,9 @@ namespace Game.States
                     // 生成主玩家
                     SpawnMainPlayer();
                     
+                    // 播放背景音乐
+                    PlayBackgroundMusic(config.StartLevelId);
+                    
                     // 启动战斗
                     _battleController?.StartBattle(1);
                 });
@@ -89,6 +97,7 @@ namespace Game.States
             {
                 // 无Session时直接生成玩家并启动战斗
                 SpawnMainPlayer();
+                PlayBackgroundMusic(1);
                 _battleController?.StartBattle(1);
             }
         }
@@ -131,5 +140,63 @@ namespace Game.States
                 Debug.Log("[InGameStateHandler] Main player destroyed");
             }
         }
+        
+        #region 背景音乐
+        
+        /// <summary>
+        /// 播放关卡背景音乐
+        /// </summary>
+        private void PlayBackgroundMusic(int levelId)
+        {
+            // 使用 GameConfigs.ConfigManager 获取关卡数据
+            var levelData = ConfigManager.GetLevel(levelId);
+            if (levelData == null)
+            {
+                Debug.LogWarning($"[InGameStateHandler] Level {levelId} not found in LevelConfig");
+                return;
+            }
+            
+            if (!levelData.HasBackgroundMusic)
+            {
+                Debug.Log($"[InGameStateHandler] Level {levelId} has no background music configured");
+                return;
+            }
+            
+            // 获取音频管理器
+            var audioMgr = GameInstance.Instance.GetComp<IAudioMgr>();
+            if (audioMgr == null)
+            {
+                Debug.LogWarning("[InGameStateHandler] AudioMgr not found");
+                return;
+            }
+            
+            // 播放背景音乐
+            var bgmClip = levelData.GetBackgroundMusic();
+            if (bgmClip != null)
+            {
+                audioMgr.PlayBGM(bgmClip, levelData.loopBackgroundMusic, levelData.musicFadeInDuration);
+                Debug.Log($"[InGameStateHandler] Playing background music: {bgmClip.name}");
+            }
+            else if (!string.IsNullOrEmpty(levelData.backgroundMusicName))
+            {
+                audioMgr.PlayBGM(levelData.backgroundMusicName, levelData.loopBackgroundMusic, levelData.musicFadeInDuration);
+                Debug.Log($"[InGameStateHandler] Playing background music: {levelData.backgroundMusicName}");
+            }
+        }
+        
+        /// <summary>
+        /// 停止背景音乐
+        /// </summary>
+        private void StopBackgroundMusic()
+        {
+            var audioMgr = GameInstance.Instance.GetComp<IAudioMgr>();
+            if (audioMgr != null && audioMgr.IsBGMPlaying)
+            {
+                audioMgr.StopBGM(0.5f);
+                Debug.Log("[InGameStateHandler] Background music stopped");
+            }
+        }
+        
+        #endregion
     }
 }
