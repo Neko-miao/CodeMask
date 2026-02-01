@@ -8,4 +8,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Setup.unity
     guid: 6fe3a56d8fb67694e8a9dc0fc00e4039
+  - enabled: 1
+    path: Assets/Resources/Scenes/Level_Forest_Art.unity
+    guid: 8349b7a9da3b2d344835c4d0d3ece6e5
   m_configObjects: {}
