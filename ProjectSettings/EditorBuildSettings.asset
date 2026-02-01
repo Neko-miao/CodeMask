@@ -11,4 +11,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Resources/Scenes/Level_Forest_Art.unity
     guid: 8349b7a9da3b2d344835c4d0d3ece6e5
+  - enabled: 1
+    path: Assets/Scenes/RhythmBattleScene.unity
+    guid: 73a4cbd8727c77a48892f4c0f4207781
   m_configObjects: {}
