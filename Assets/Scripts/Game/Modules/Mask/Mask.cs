@@ -14,6 +14,11 @@ namespace Game
         [Header("面具类型")]
         [SerializeField] private MaskType maskType = MaskType.None;
         
+        [Header("图片显示")]
+        [SerializeField] 
+        [Tooltip("MaskPresentation父物体，子物体按顺序对应MaskType枚举")]
+        private Transform maskPresentation;
+        
         [Header("状态")]
         [SerializeField] private MaskState currentState = MaskState.Active;
 
@@ -39,6 +44,7 @@ namespace Game
         // 组件缓存
         private Rigidbody2D rb;
         private BoxCollider2D boxCollider;
+        private Transform[] maskIcons;  // 缓存子物体引用
 
         // 飞行状态
         private bool isFlying;
@@ -72,7 +78,29 @@ namespace Game
         {
             rb = GetComponent<Rigidbody2D>();
             boxCollider = GetComponent<BoxCollider2D>();
+            
+            // 缓存MaskPresentation下的所有子物体
+            CacheMaskIcons();
+            
             SetupPhysicsMaterial();
+        }
+        
+        /// <summary>
+        /// 缓存MaskPresentation下的子物体引用
+        /// </summary>
+        private void CacheMaskIcons()
+        {
+            if (maskPresentation == null) return;
+            
+            int childCount = maskPresentation.childCount;
+            maskIcons = new Transform[childCount];
+            
+            for (int i = 0; i < childCount; i++)
+            {
+                maskIcons[i] = maskPresentation.GetChild(i);
+            }
+            
+            Debug.Log($"[Mask] 缓存了 {childCount} 个Icon子物体");
         }
 
         void Start()
@@ -147,13 +175,61 @@ namespace Game
         /// <param name="type">面具类型</param>
         public void SetMaskType(MaskType type)
         {
-            if (maskType != type)
+            maskType = type;
+            maskData = MaskConfig.GetMaskData(type);
+            
+            // 更新显示
+            UpdateIconDisplay();
+            
+            OnMaskTypeChanged?.Invoke(type);
+            Debug.Log($"[Mask] 设置类型: {type}, 名称: {maskData?.Name ?? "Unknown"}");
+        }
+        
+        /// <summary>
+        /// 根据当前MaskType更新Icon显示（显示对应子物体，隐藏其他）
+        /// </summary>
+        private void UpdateIconDisplay()
+        {
+            if (maskIcons == null || maskIcons.Length == 0)
             {
-                maskType = type;
-                maskData = MaskConfig.GetMaskData(type);
-                OnMaskTypeChanged?.Invoke(type);
-                Debug.Log($"[Mask] 设置类型: {type}, 名称: {maskData?.Name ?? "Unknown"}");
+                return;
             }
+            
+            int typeIndex = (int)maskType;
+            
+            for (int i = 0; i < maskIcons.Length; i++)
+            {
+                if (maskIcons[i] != null)
+                {
+                    maskIcons[i].gameObject.SetActive(i == typeIndex);
+                }
+            }
+        }
+        
+        /// <summary>
+        /// 获取当前显示的Icon Transform
+        /// </summary>
+        public Transform GetCurrentIcon()
+        {
+            int typeIndex = (int)maskType;
+            if (maskIcons != null && typeIndex >= 0 && typeIndex < maskIcons.Length)
+            {
+                return maskIcons[typeIndex];
+            }
+            return null;
+        }
+        
+        /// <summary>
+        /// 获取指定MaskType的Icon Transform
+        /// </summary>
+        public Transform GetIcon(MaskType type)
+        {
+            int typeIndex = (int)type;
+            if (maskIcons != null && typeIndex >= 0 && typeIndex < maskIcons.Length)
+            {
+                return maskIcons[typeIndex];
+            }
+            return null;
         }
         
         /// <summary>
