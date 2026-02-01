@@ -9,6 +9,7 @@ using GameFramework.Components;
 using Game.UI;
 using Game.Battle;
 using Game.Modules;
+using Game.Monsters;
 using GameConfigs;
 using UnityEngine;
 
@@ -21,6 +22,8 @@ namespace Game.States
     {
         private BattleUIController _battleUIController;
         private BattleController _battleController;
+        private MonsterSpawner _monsterSpawner;
+        private int _currentLevelId = 1;
         
         public void OnEnter()
         {
@@ -44,6 +47,9 @@ namespace Game.States
         public void OnExit()
         {
             Debug.Log("[InGameStateHandler] Exiting InGame State");
+            
+            // 停止刷怪
+            StopMonsterSpawning();
             
             // 停止背景音乐
             StopBackgroundMusic();
@@ -83,11 +89,16 @@ namespace Game.States
                 // 使用协程启动Session，完成后生成玩家并启动战斗
                 session.StartSession(config, () =>
                 {
+                    _currentLevelId = config.StartLevelId;
+                    
                     // 生成主玩家
                     SpawnMainPlayer();
                     
                     // 播放背景音乐
                     PlayBackgroundMusic(config.StartLevelId);
+                    
+                    // 开始刷怪
+                    StartMonsterSpawning(config.StartLevelId);
                     
                     // 启动战斗
                     _battleController?.StartBattle(1);
@@ -96,8 +107,10 @@ namespace Game.States
             else
             {
                 // 无Session时直接生成玩家并启动战斗
+                _currentLevelId = 1;
                 SpawnMainPlayer();
                 PlayBackgroundMusic(1);
+                StartMonsterSpawning(1);
                 _battleController?.StartBattle(1);
             }
         }
@@ -195,6 +208,104 @@ namespace Game.States
                 audioMgr.StopBGM(0.5f);
                 Debug.Log("[InGameStateHandler] Background music stopped");
             }
+        }
+        
+        #endregion
+        
+        #region 刷怪控制
+        
+        /// <summary>
+        /// 开始刷怪
+        /// </summary>
+        private void StartMonsterSpawning(int levelId)
+        {
+            // 获取关卡数据
+            var levelData = ConfigManager.GetLevel(levelId);
+            if (levelData == null || levelData.spawnConfig == null)
+            {
+                Debug.Log($"[InGameStateHandler] Level {levelId} has no spawn config");
+                return;
+            }
+            
+            // 创建或获取MonsterSpawner
+            if (_monsterSpawner == null)
+            {
+                var spawnerGo = new GameObject("MonsterSpawner");
+                _monsterSpawner = spawnerGo.AddComponent<MonsterSpawner>();
+            }
+            
+            // 订阅刷怪事件
+            _monsterSpawner.OnWaveStarted += OnWaveStarted;
+            _monsterSpawner.OnWaveCompleted += OnWaveCompleted;
+            _monsterSpawner.OnAllWavesCompleted += OnAllWavesCompleted;
+            _monsterSpawner.OnMonsterSpawned += OnMonsterSpawned;
+            
+            // 开始刷怪
+            _monsterSpawner.StartSpawning(levelData.spawnConfig);
+            
+            Debug.Log($"[InGameStateHandler] Monster spawning started for level {levelId}");
+        }
+        
+        /// <summary>
+        /// 停止刷怪
+        /// </summary>
+        private void StopMonsterSpawning()
+        {
+            if (_monsterSpawner != null)
+            {
+                // 取消订阅事件
+                _monsterSpawner.OnWaveStarted -= OnWaveStarted;
+                _monsterSpawner.OnWaveCompleted -= OnWaveCompleted;
+                _monsterSpawner.OnAllWavesCompleted -= OnAllWavesCompleted;
+                _monsterSpawner.OnMonsterSpawned -= OnMonsterSpawned;
+                
+                _monsterSpawner.StopSpawning();
+                
+                // 销毁MonsterSpawner
+                Object.Destroy(_monsterSpawner.gameObject);
+                _monsterSpawner = null;
+            }
+            
+            // 销毁所有怪物
+            var monsterMgr = GameInstance.Instance.GetComp<IMonsterMgr>();
+            monsterMgr?.DestroyAllMonsters();
+            
+            Debug.Log("[InGameStateHandler] Monster spawning stopped");
+        }
+        
+        /// <summary>
+        /// 波次开始事件
+        /// </summary>
+        private void OnWaveStarted(int waveIndex, WaveConfig waveConfig)
+        {
+            Debug.Log($"[InGameStateHandler] Wave {waveIndex + 1} started: {waveConfig.waveName}");
+        }
+        
+        /// <summary>
+        /// 波次完成事件
+        /// </summary>
+        private void OnWaveCompleted(int waveIndex, WaveConfig waveConfig)
+        {
+            Debug.Log($"[InGameStateHandler] Wave {waveIndex + 1} completed: {waveConfig.waveName}");
+        }
+        
+        /// <summary>
+        /// 所有波次完成事件
+        /// </summary>
+        private void OnAllWavesCompleted()
+        {
+            Debug.Log("[InGameStateHandler] All waves completed! Level victory!");
+            
+            // 关卡胜利
+            _battleController?.EndBattle(true);
+        }
+        
+        /// <summary>
+        /// 怪物生成事件
+        /// </summary>
+        private void OnMonsterSpawned(Monster monster, int waveIndex, int totalSpawned)
+        {
+            Debug.Log($"[InGameStateHandler] Monster spawned: {monster.MonsterName} (Wave: {waveIndex + 1}, Total: {totalSpawned})");
         }
         
         #endregion

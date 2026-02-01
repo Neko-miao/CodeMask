@@ -94,6 +94,26 @@ namespace GameConfigs
         }
 
         /// <summary>
+        /// 加载怪物预制体
+        /// </summary>
+        /// <param name="monsterType">怪物类型</param>
+        /// <returns>怪物预制体</returns>
+        public static GameObject LoadMonsterPrefab(MonsterType monsterType)
+        {
+            var monsterData = GetMonster(monsterType);
+            return monsterData?.LoadPrefab();
+        }
+
+        /// <summary>
+        /// 检查怪物是否有有效的预制体配置
+        /// </summary>
+        public static bool HasMonsterPrefab(MonsterType monsterType)
+        {
+            var monsterData = GetMonster(monsterType);
+            return monsterData?.HasPrefab ?? false;
+        }
+
+        /// <summary>
         /// 获取指定章节的所有关卡
         /// </summary>
         public static System.Collections.Generic.List<LevelData> GetLevelsByChapter(int chapter)

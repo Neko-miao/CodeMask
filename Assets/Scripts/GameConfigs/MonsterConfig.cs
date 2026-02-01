@@ -25,12 +25,38 @@ namespace GameConfigs
         [TextArea(2, 4)]
         public string description;
 
-        [Header("资源路径")]
-        [Tooltip("怪物预制体路径（相对于Resources）")]
+        [Header("资源设置")]
+        [Tooltip("怪物预制体引用（优先使用）")]
+        public GameObject prefab;
+
+        [Tooltip("怪物预制体路径（如果prefab为空，则使用此路径从Resources加载）")]
         public string prefabPath;
 
         [Tooltip("怪物图标路径（相对于Resources）")]
         public string iconPath;
+
+        /// <summary>
+        /// 加载怪物预制体（优先使用prefab引用，其次从路径加载）
+        /// </summary>
+        public GameObject LoadPrefab()
+        {
+            if (prefab != null)
+            {
+                return prefab;
+            }
+            
+            if (!string.IsNullOrEmpty(prefabPath))
+            {
+                return Resources.Load<GameObject>(prefabPath);
+            }
+            
+            return null;
+        }
+
+        /// <summary>
+        /// 是否有有效的预制体配置
+        /// </summary>
+        public bool HasPrefab => prefab != null || !string.IsNullOrEmpty(prefabPath);
 
         [Header("基础属性")]
         [Tooltip("生命值")]

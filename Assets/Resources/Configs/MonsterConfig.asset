@@ -16,8 +16,9 @@ MonoBehaviour:
   - monsterType: 100
     monsterName: "\u86C7"
     description: "\u68EE\u6797\u4E2D\u7684\u57FA\u7840\u602A\u7269\uFF0C\u653B\u51FB\u8FC5\u901F\u4F46\u8840\u91CF\u8F83\u4F4E"
-    prefabPath: "Prefabs/Monsters/Snake"
-    iconPath: "Icons/Monsters/snake"
+    prefab: {fileID: 5107669885520883098, guid: ea8aea93b53df9a4589a8252ab80e4f5, type: 3}
+    prefabPath: Prefabs/Monsters/Snake
+    iconPath: Icons/Monsters/snake
     health: 80
     attack: 15
     defense: 5
@@ -31,8 +32,9 @@ MonoBehaviour:
   - monsterType: 101
     monsterName: "\u732B"
     description: "\u654F\u6377\u7684\u68EE\u6797\u731B\u517D\uFF0C\u79FB\u52A8\u901F\u5EA6\u5FEB"
-    prefabPath: "Prefabs/Monsters/Cat"
-    iconPath: "Icons/Monsters/cat"
+    prefab: {fileID: 0}
+    prefabPath: Prefabs/Monsters/Cat
+    iconPath: Icons/Monsters/cat
     health: 100
     attack: 12
     defense: 8
@@ -46,8 +48,9 @@ MonoBehaviour:
   - monsterType: 102
     monsterName: "\u718A"
     description: "\u5F3A\u58EE\u7684\u68EE\u6797\u5DE8\u517D\uFF0C\u9AD8\u8840\u91CF\u9AD8\u653B\u51FB"
-    prefabPath: "Prefabs/Monsters/Bear"
-    iconPath: "Icons/Monsters/bear"
+    prefab: {fileID: 0}
+    prefabPath: Prefabs/Monsters/Bear
+    iconPath: Icons/Monsters/bear
     health: 300
     attack: 25
     defense: 15
@@ -61,8 +64,9 @@ MonoBehaviour:
   - monsterType: 103
     monsterName: "\u516C\u725B"
     description: "\u51F6\u731B\u7684\u68EE\u6797\u5DE8\u517D\uFF0C\u4F1A\u51B2\u649E\u653B\u51FB"
-    prefabPath: "Prefabs/Monsters/Bull"
-    iconPath: "Icons/Monsters/bull"
+    prefab: {fileID: 0}
+    prefabPath: Prefabs/Monsters/Bull
+    iconPath: Icons/Monsters/bull
     health: 250
     attack: 30
     defense: 12
@@ -76,8 +80,9 @@ MonoBehaviour:
   - monsterType: 200
     monsterName: "\u9CB8\u9C7C"
     description: "\u6D77\u6D0B\u4E2D\u7684\u5DE8\u578B\u751F\u7269\uFF0C\u8840\u91CF\u6781\u9AD8"
-    prefabPath: "Prefabs/Monsters/Whale"
-    iconPath: "Icons/Monsters/whale"
+    prefab: {fileID: 0}
+    prefabPath: Prefabs/Monsters/Whale
+    iconPath: Icons/Monsters/whale
     health: 500
     attack: 20
     defense: 20
@@ -91,8 +96,9 @@ MonoBehaviour:
   - monsterType: 201
     monsterName: "\u9CA8\u9C7C"
     description: "\u51F6\u731B\u7684\u6D77\u6D0B\u6740\u624B\uFF0C\u653B\u51FB\u529B\u5F3A"
-    prefabPath: "Prefabs/Monsters/Shark"
-    iconPath: "Icons/Monsters/shark"
+    prefab: {fileID: 0}
+    prefabPath: Prefabs/Monsters/Shark
+    iconPath: Icons/Monsters/shark
     health: 200
     attack: 35
     defense: 10
@@ -106,8 +112,9 @@ MonoBehaviour:
   - monsterType: 300
     monsterName: "\u9F99"
     description: "\u5929\u7A7A\u4E2D\u7684\u5F3A\u5927\u751F\u7269\uFF0C\u80FD\u591F\u55B7\u706B"
-    prefabPath: "Prefabs/Monsters/Dragon"
-    iconPath: "Icons/Monsters/dragon"
+    prefab: {fileID: 0}
+    prefabPath: Prefabs/Monsters/Dragon
+    iconPath: Icons/Monsters/dragon
     health: 400
     attack: 45
     defense: 25
@@ -121,8 +128,9 @@ MonoBehaviour:
   - monsterType: 1000
     monsterName: "\u68EE\u6797\u5B88\u62A4\u8005"
     description: "\u68EE\u6797\u7684\u7EC8\u6781Boss\uFF0C\u62E5\u6709\u5F3A\u5927\u7684\u81EA\u7136\u4E4B\u529B"
-    prefabPath: "Prefabs/Monsters/ForestBoss"
-    iconPath: "Icons/Monsters/forest_boss"
+    prefab: {fileID: 0}
+    prefabPath: Prefabs/Monsters/ForestBoss
+    iconPath: Icons/Monsters/forest_boss
     health: 2000
     attack: 50
     defense: 30
@@ -136,8 +144,9 @@ MonoBehaviour:
   - monsterType: 1001
     monsterName: "\u6DF1\u6D77\u9738\u4E3B"
     description: "\u6D77\u6D0B\u7684\u7EC8\u6781Boss\uFF0C\u7EDF\u6CBB\u6DF1\u6D77\u7684\u53E4\u8001\u5B58\u5728"
-    prefabPath: "Prefabs/Monsters/OceanBoss"
-    iconPath: "Icons/Monsters/ocean_boss"
+    prefab: {fileID: 0}
+    prefabPath: Prefabs/Monsters/OceanBoss
+    iconPath: Icons/Monsters/ocean_boss
     health: 2500
     attack: 55
     defense: 35
@@ -151,8 +160,9 @@ MonoBehaviour:
   - monsterType: 1002
     monsterName: "\u5929\u7A7A\u9738\u4E3B"
     description: "\u5929\u7A7A\u7684\u7EC8\u6781Boss\uFF0C\u62E5\u6709\u7FFC\u5C55\u906E\u5929\u7684\u5DE8\u7FFC"
-    prefabPath: "Prefabs/Monsters/SkyBoss"
-    iconPath: "Icons/Monsters/sky_boss"
+    prefab: {fileID: 0}
+    prefabPath: Prefabs/Monsters/SkyBoss
+    iconPath: Icons/Monsters/sky_boss
     health: 3000
     attack: 60
     defense: 40
