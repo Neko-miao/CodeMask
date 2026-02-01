@@ -298,6 +298,7 @@ namespace Game
                 if (!keyBindings.ContainsKey(key) || keyBindings[key] == null)
                 {
                     keyBindings[key] = mask;
+                    mask.SetBoundKey(key);  // 通知Mask更新按键显示
                     Debug.Log($"[MaskSystem] Mask绑定到 {key}");
                     return;
                 }
@@ -310,7 +311,10 @@ namespace Game
             foreach (var kvp in keyBindings)
                 if (kvp.Value == mask) { toRemove = kvp.Key; break; }
             if (toRemove != KeyCode.None)
+            {
                 keyBindings.Remove(toRemove);
+                mask.SetBoundKey(KeyCode.None);  // 清除Mask的按键绑定
+            }
         }
 
         #endregion
