@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Game.Events;
 
 namespace Game
 {
@@ -43,6 +44,11 @@ namespace Game
         public event Action OnSequenceComplete;
         public event Action<Rhythm> OnRhythmMiss;
 
+        /// <summary>
+        /// 节奏创建事件（静态事件，供其他系统订阅）
+        /// </summary>
+        public static event Action<RhythmCreatedEvent> OnRhythmCreated;
+
         void Awake()
         {
             if (Instance == null) Instance = this;
@@ -75,21 +81,34 @@ namespace Game
         }
 
         /// <summary>
-        /// 检查节奏是否到达终点（纯距离计算）
+        /// 检查节奏是否超过判定区域（到达第二个Miss边界即左边界）
         /// </summary>
         private void CheckRhythmsAtEndPoint()
         {
-            if (endPoint == null) return;
-            float endX = endPoint.position.x;
+            // 优先使用判定区域的左边界，如果没有则使用endPoint
+            float missLeftX;
+            if (RhythmTriggerZone.Instance != null)
+            {
+                missLeftX = RhythmTriggerZone.Instance.ZoneLeftX;
+            }
+            else if (endPoint != null)
+            {
+                missLeftX = endPoint.position.x;
+            }
+            else
+            {
+                return;
+            }
 
             for (int i = activeRhythms.Count - 1; i >= 0; i--)
             {
                 var rhythm = activeRhythms[i];
                 if (rhythm == null) { activeRhythms.RemoveAt(i); continue; }
 
-                if (rhythm.PositionX <= endX)
+                // 节奏超过判定区域左边界（第二个Miss边界）
+                if (rhythm.PositionX <= missLeftX)
                 {
-                    Debug.Log($"<color=red>[RhythmSystem] {rhythm.name} Miss</color>");
+                    Debug.Log($"<color=red>[RhythmSystem] {rhythm.name} 超过判定区域，Miss!</color>");
                     OnRhythmMiss?.Invoke(rhythm);
                     RhythmTriggerZone.Instance?.OnRhythmMissed(rhythm);
                     activeRhythms.RemoveAt(i);
@@ -245,7 +264,80 @@ namespace Game
             activeRhythms.Add(rhythm);
             OnBeat?.Invoke(rhythm);
 
+            // 计算到达判定区域的时间并发布事件
+            // 计算到达判定区域和完美区间的时间并发布事件
+            float timeToReachZone = CalculateTimeToReachJudgmentZone();
+            float timeToReachPerfect = CalculateTimeToReachPerfectZone();
+            PublishRhythmCreatedEvent(rhythm, mask, config.actionType, timeToReachZone, timeToReachPerfect, spawnPoint.position);
+
             return true;
+        }
+
+        /// <summary>
+        /// 计算节奏从生成点到达判定区域第一个未命中判定点的时间
+        /// </summary>
+        private float CalculateTimeToReachJudgmentZone()
+        {
+            if (spawnPoint == null || RhythmTriggerZone.Instance == null || moveSpeed <= 0f)
+            {
+                return 0f;
+            }
+
+            // 获取生成点X坐标
+            float spawnX = spawnPoint.position.x;
+            
+            // 获取判定区域的右边界（第一个未命中判定点）
+            // 节奏是向左移动的，所以需要到达判定区域的右边界
+            float judgeRightX = RhythmTriggerZone.Instance.ZoneRightX;
+            
+            // 计算距离
+            float distance = spawnX - judgeRightX;
+            
+            // 计算时间 = 距离 / 速度
+            if (distance <= 0f)
+            {
+                return 0f;
+            }
+            
+            return distance / moveSpeed;
+        }
+
+        /// <summary>
+        /// 计算节奏从生成点到达完美判定区间中心的时间
+        /// </summary>
+        private float CalculateTimeToReachPerfectZone()
+        {
+            if (spawnPoint == null || RhythmTriggerZone.Instance == null || moveSpeed <= 0f)
+            {
+                return 0f;
+            }
+
+            // 获取生成点X坐标
+            float spawnX = spawnPoint.position.x;
+            
+            // 获取完美区间中心X坐标
+            float perfectCenterX = RhythmTriggerZone.Instance.PerfectZoneCenterX;
+            
+            // 计算距离
+            float distance = spawnX - perfectCenterX;
+            
+            // 计算时间 = 距离 / 速度
+            if (distance <= 0f)
+            {
+                return 0f;
+            }
+            
+            return distance / moveSpeed;
+        }
+
+        /// <summary>
+        /// 发布节奏创建事件
+        /// </summary>
+        private void PublishRhythmCreatedEvent(Rhythm rhythm, MaskType maskType, RhythmActionType actionType, float timeToReachZone, float timeToReachPerfect, Vector3 spawnPos)
+        {
+            var evt = new RhythmCreatedEvent(rhythm, maskType, actionType, timeToReachZone, timeToReachPerfect, spawnPos);
+            OnRhythmCreated?.Invoke(evt);
+            Debug.Log($"[RhythmSystem] 已发布 RhythmCreatedEvent: ActionType={actionType}, TimeToReachZone={timeToReachZone:F2}s, TimeToReachPerfect={timeToReachPerfect:F2}s");
         }
     }
 }

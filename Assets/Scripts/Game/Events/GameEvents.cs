@@ -176,6 +176,53 @@ namespace Game.Events
         }
     }
     
+    /// <summary>
+    /// 节奏创建事件数据 - 当RhythmSystem创建新的Rhythm时触发
+    /// </summary>
+    public struct RhythmCreatedEvent
+    {
+        /// <summary>
+        /// 创建的节奏实例
+        /// </summary>
+        public Rhythm Rhythm;
+        
+        /// <summary>
+        /// 面具类型
+        /// </summary>
+        public MaskType MaskType;
+        
+        /// <summary>
+        /// 节奏行为类型
+        /// </summary>
+        public RhythmActionType ActionType;
+        
+        /// <summary>
+        /// 节奏到达判定区域第一个未命中点的时间（秒）
+        /// </summary>
+        public float TimeToReachJudgmentZone;
+        
+        /// <summary>
+        /// 节奏到达完美判定区间中心的时间（秒）
+        /// 敌人攻击动画应该在此时刻结束
+        /// </summary>
+        public float TimeToReachPerfectZone;
+        
+        /// <summary>
+        /// 节奏的起始位置
+        /// </summary>
+        public Vector3 SpawnPosition;
+        
+        public RhythmCreatedEvent(Rhythm rhythm, MaskType maskType, RhythmActionType actionType, float timeToReachZone, float timeToReachPerfect, Vector3 spawnPos)
+        {
+            Rhythm = rhythm;
+            MaskType = maskType;
+            ActionType = actionType;
+            TimeToReachJudgmentZone = timeToReachZone;
+            TimeToReachPerfectZone = timeToReachPerfect;
+            SpawnPosition = spawnPos;
+        }
+    }
+    
     #endregion
 }
 

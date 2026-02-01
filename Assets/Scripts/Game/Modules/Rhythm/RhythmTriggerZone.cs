@@ -120,6 +120,16 @@ namespace Game
         /// </summary>
         public float ZoneRightX => transform.position.x + zoneWidth / 2f;
 
+        /// <summary>
+        /// Perfect区域右边界X坐标
+        /// </summary>
+        public float PerfectZoneRightX => transform.position.x + (zoneWidth / 2f) * perfectZonePercent;
+
+        /// <summary>
+        /// Perfect区域中心X坐标
+        /// </summary>
+        public float PerfectZoneCenterX => transform.position.x;
+
         #endregion
 
         void Awake()
