@@ -97,6 +97,10 @@ MonoBehaviour:
       maxDamageCountForThreeStar: 3
     timeLimit: 300
     lifeLimit: 3
+    backgroundMusic: {fileID: 8300000, guid: 828aaa6e5e0733d46905b804615055e1, type: 3}
+    backgroundMusicName: 
+    loopBackgroundMusic: 1
+    musicFadeInDuration: 0.5
   - levelId: 2
     levelName: "\u6DF1\u6D77\u5192\u9669"
     description: "\u6F5C\u5165\u6DF1\u6D77\uFF0C\u5BFB\u627E\u9690\u85CF\u7684\u5B9D\u85CF\uFF01"
@@ -161,6 +165,10 @@ MonoBehaviour:
       maxDamageCountForThreeStar: 5
     timeLimit: 360
     lifeLimit: 3
+    backgroundMusic: {fileID: 0}
+    backgroundMusicName: 
+    loopBackgroundMusic: 1
+    musicFadeInDuration: 0.5
   - levelId: 3
     levelName: "\u5929\u7A7A\u4E4B\u57CE"
     description: "\u98DE\u5411\u5929\u7A7A\u4E4B\u57CE\uFF0C\u6311\u6218\u6700\u5F3A\u7684\u654C\u4EBA\uFF01"
@@ -245,3 +253,7 @@ MonoBehaviour:
       maxDamageCountForThreeStar: 2
     timeLimit: 420
     lifeLimit: 3
+    backgroundMusic: {fileID: 0}
+    backgroundMusicName: 
+    loopBackgroundMusic: 1
+    musicFadeInDuration: 0.5
