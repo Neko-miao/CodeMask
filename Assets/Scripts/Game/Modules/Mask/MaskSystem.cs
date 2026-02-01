@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Game.Events;
+using Game.Battle;
+using Game.UI;
 
 namespace Game
 {
@@ -21,7 +23,7 @@ namespace Game
 
         [Header("选择UI")]
         [SerializeField] private GameObject selectionUIRoot;
-        [SerializeField] private List<UnityEngine.UI.Button> selectionButtons = new List<UnityEngine.UI.Button>(4);
+        [SerializeField] private List<ImageSelectButton> selectionButtons = new List<ImageSelectButton>(4);
 
         [Header("Perfect设置")]
         [SerializeField] private int perfectCountForLaunch = 3;
@@ -31,6 +33,7 @@ namespace Game
         private List<Mask> maskQueue = new List<Mask>(3);
         private Dictionary<KeyCode, Mask> keyBindings = new Dictionary<KeyCode, Mask>();
         private Mask pendingMask;
+        private MaskType pendingMaskType;  // 待处理的Mask类型
         private Mask currentWearingMask;  // 当前穿戴中的Mask
         private int perfectLaunchCount = 0;
         private int perfectCreateCount = 0;
@@ -149,7 +152,21 @@ namespace Game
 
         #region 公共接口
 
+        /// <summary>
+        /// 创建一个随机类型的Mask
+        /// </summary>
         public bool CreateMask()
+        {
+            // 随机选择一个MaskType（排除None和Dragon）
+            MaskType randomType = GetRandomMaskType();
+            return CreateMask(randomType);
+        }
+
+        /// <summary>
+        /// 创建指定类型的Mask
+        /// </summary>
+        /// <param name="maskType">面具类型</param>
+        public bool CreateMask(MaskType maskType)
         {
             if (maskPrefab == null)
             {
@@ -162,7 +179,8 @@ namespace Game
             if (nextIndex < 0)
             {
                 // 队列已满，弹出选择窗口
-                pendingMask = InstantiateMask(-1);
+                pendingMask = InstantiateMask(-1, maskType);
+                pendingMaskType = maskType;
                 if (pendingMask != null)
                 {
                     pendingMask.gameObject.SetActive(false);
@@ -171,15 +189,27 @@ namespace Game
                 return false;
             }
 
-            Mask newMask = InstantiateMask(nextIndex);
+            Mask newMask = InstantiateMask(nextIndex, maskType);
             if (newMask != null)
             {
                 maskQueue.Add(newMask);
                 BindMaskToKey(newMask);
-                Debug.Log($"[MaskSystem] 创建Mask成功，当前数量: {maskQueue.Count}");
+                Debug.Log($"[MaskSystem] 创建Mask成功，类型: {maskType}，当前数量: {maskQueue.Count}");
                 return true;
             }
             return false;
+        }
+
+        /// <summary>
+        /// 获取随机的MaskType（排除None和Dragon）
+        /// </summary>
+        private MaskType GetRandomMaskType()
+        {
+            MaskType[] availableTypes = { 
+                MaskType.Cat, MaskType.Snake, MaskType.Bear, 
+                MaskType.Horse, MaskType.Bull, MaskType.Whale, MaskType.Shark 
+            };
+            return availableTypes[Random.Range(0, availableTypes.Length)];
         }
 
         public Mask GetMask(int index) => (index >= 0 && index < maskQueue.Count) ? maskQueue[index] : null;
@@ -294,7 +324,10 @@ namespace Game
             {
                 int idx = i;
                 if (selectionButtons[i] != null)
-                    selectionButtons[i].onClick.AddListener(() => OnSelectionButtonClicked(idx));
+                {
+                    // 使用ImageSelectButton的OnMaskClick事件
+                    selectionButtons[i].OnMaskClick += (maskType) => OnSelectionButtonClicked(idx);
+                }
             }
         }
 
@@ -303,10 +336,37 @@ namespace Game
             if (selectionUIRoot == null) { OnSelectionButtonClicked(0); return; }
             selectionUIRoot.SetActive(true);
             Time.timeScale = 0f;
+            
+            // 更新选择按钮显示
             for (int i = 0; i < selectionButtons.Count; i++)
             {
                 if (selectionButtons[i] != null)
-                    selectionButtons[i].gameObject.SetActive(i < 3 ? i < maskQueue.Count : pendingMask != null);
+                {
+                    bool shouldShow = false;
+                    
+                    if (i < 3)
+                    {
+                        // 前三个按钮显示已有的Mask
+                        shouldShow = i < maskQueue.Count;
+                        if (shouldShow && maskQueue[i] != null)
+                        {
+                            // 将Mask的MaskType数据传递给按钮
+                            MaskType maskType = maskQueue[i].MaskType;
+                            selectionButtons[i].Initialize(maskType);
+                        }
+                    }
+                    else if (i == 3)
+                    {
+                        // 第四个按钮显示待处理的新Mask
+                        shouldShow = pendingMask != null;
+                        if (shouldShow)
+                        {
+                            selectionButtons[i].Initialize(pendingMaskType);
+                        }
+                    }
+                    
+                    selectionButtons[i].gameObject.SetActive(shouldShow);
+                }
             }
         }
 
@@ -333,6 +393,7 @@ namespace Game
                     maskQueue.Add(pendingMask);
                     BindMaskToKey(pendingMask);
                     pendingMask = null;
+                    pendingMaskType = MaskType.None;
                 }
                 RearrangeMasks();
             }
@@ -340,6 +401,7 @@ namespace Game
             {
                 Destroy(pendingMask.gameObject);
                 pendingMask = null;
+                pendingMaskType = MaskType.None;
             }
             HideSelectionUI();
         }
@@ -355,14 +417,23 @@ namespace Game
 
         #region 辅助方法
 
-        private Mask InstantiateMask(int posIdx)
+        private Mask InstantiateMask(int posIdx, MaskType maskType = MaskType.None)
         {
             Vector3 pos = (posIdx >= 0 && posIdx < spawnPositions.Count && spawnPositions[posIdx] != null)
                 ? spawnPositions[posIdx].position : Vector3.zero;
 
             var obj = Instantiate(maskPrefab, pos, Quaternion.identity);
             var mask = obj.GetComponent<Mask>() ?? obj.AddComponent<Mask>();
+            
+            // 设置MaskType
+            if (maskType == MaskType.None)
+            {
+                maskType = GetRandomMaskType();
+            }
+            mask.SetMaskType(maskType);
             mask.SetState(MaskState.Active);
+            
+            Debug.Log($"[MaskSystem] 实例化Mask: 类型={maskType}, 位置索引={posIdx}");
             return mask;
         }
 

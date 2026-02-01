@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using Game.Battle;
 
 namespace Game
 {
@@ -10,6 +11,9 @@ namespace Game
 
     public class Mask : MonoBehaviour
     {
+        [Header("面具类型")]
+        [SerializeField] private MaskType maskType = MaskType.None;
+        
         [Header("状态")]
         [SerializeField] private MaskState currentState = MaskState.Active;
 
@@ -48,12 +52,18 @@ namespace Game
         // 初始状态（用于重置）
         private Vector2 initialPosition;
         private Quaternion initialRotation;
+        
+        // 面具数据缓存
+        private MaskData maskData;
 
         // 公共属性和事件
         public MaskState CurrentState => currentState;
+        public MaskType MaskType => maskType;
+        public MaskData MaskData => maskData;
         public bool IsFlying => isFlying;
         public Action OnFlightComplete;
         public Action<MaskState> OnStateChanged;
+        public Action<MaskType> OnMaskTypeChanged;
         public Action<Collider2D> OnHitTarget;
 
         #region Unity生命周期
@@ -130,6 +140,45 @@ namespace Game
         }
 
         public void SetWearingFollowTarget(Transform target) => wearingFollowTarget = target;
+        
+        /// <summary>
+        /// 设置面具类型
+        /// </summary>
+        /// <param name="type">面具类型</param>
+        public void SetMaskType(MaskType type)
+        {
+            if (maskType != type)
+            {
+                maskType = type;
+                maskData = MaskConfig.GetMaskData(type);
+                OnMaskTypeChanged?.Invoke(type);
+                Debug.Log($"[Mask] 设置类型: {type}, 名称: {maskData?.Name ?? "Unknown"}");
+            }
+        }
+        
+        /// <summary>
+        /// 获取面具攻击力
+        /// </summary>
+        public int GetAttackPower()
+        {
+            return maskData?.AttackPower ?? 1;
+        }
+        
+        /// <summary>
+        /// 获取面具效果类型
+        /// </summary>
+        public MaskEffectType GetEffectType()
+        {
+            return maskData?.EffectType ?? MaskEffectType.Attack;
+        }
+        
+        /// <summary>
+        /// 检查是否克制目标面具
+        /// </summary>
+        public bool IsCounterTo(MaskType targetType)
+        {
+            return MaskConfig.IsCounter(maskType, targetType);
+        }
 
         #endregion
 
