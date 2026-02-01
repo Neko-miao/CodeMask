@@ -958,6 +958,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: BGRoot_Instanse
       objectReference: {fileID: 0}
+    - target: {fileID: 5380645386098950308, guid: f05c3879f424e8a449f64584780bd978, type: 3}
+      propertyPath: m_Size.y
+      value: 1.2301123
+      objectReference: {fileID: 0}
+    - target: {fileID: 5380645386098950308, guid: f05c3879f424e8a449f64584780bd978, type: 3}
+      propertyPath: m_Offset.y
+      value: 0.11505625
+      objectReference: {fileID: 0}
     - target: {fileID: 5521391321454214700, guid: f05c3879f424e8a449f64584780bd978, type: 3}
       propertyPath: m_IsActive
       value: 0
