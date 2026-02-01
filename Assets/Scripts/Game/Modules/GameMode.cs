@@ -46,13 +46,13 @@ namespace Game
         [SerializeField]
         private float shakeDuration = 0.3f;
 
-        [Tooltip("攻击目标的SpriteRenderer（用于震动）")]
+        [Tooltip("攻击目标的GameObject（用于震动）")]
         [SerializeField]
-        private SpriteRenderer attackTargetRenderer;
+        private GameObject attackTargetObject;
 
-        [Tooltip("Miss攻击目标的SpriteRenderer（用于震动）")]
+        [Tooltip("Miss攻击目标的GameObject（用于震动）")]
         [SerializeField]
-        private SpriteRenderer missAttackTargetRenderer;
+        private GameObject missAttackTargetObject;
 
         /// <summary>
         /// 当前Perfect连击次数
@@ -130,7 +130,7 @@ namespace Game
             EffectSystem.Instance.PlayAttackEffect(
                 attackStartPoint.position, 
                 attackEndPoint.position,
-                () => OnAttackReachTarget(attackTargetRenderer)
+                () => OnAttackReachTarget(attackTargetObject)
             );
         }
 
@@ -158,7 +158,7 @@ namespace Game
             EffectSystem.Instance.PlayAttackEffect(
                 attackStartPoint.position, 
                 attackEndPoint.position,
-                () => OnAttackReachTarget(attackTargetRenderer)
+                () => OnAttackReachTarget(attackTargetObject)
             );
         }
 
@@ -186,23 +186,23 @@ namespace Game
             EffectSystem.Instance.PlayAttackEffect(
                 missAttackStartPoint.position, 
                 missAttackEndPoint.position,
-                () => OnAttackReachTarget(missAttackTargetRenderer)
+                () => OnAttackReachTarget(missAttackTargetObject)
             );
         }
 
         /// <summary>
         /// 攻击特效抵达目标点回调 - 触发震动
         /// </summary>
-        /// <param name="targetRenderer">目标SpriteRenderer</param>
-        private void OnAttackReachTarget(SpriteRenderer targetRenderer)
+        /// <param name="targetObject">目标GameObject</param>
+        private void OnAttackReachTarget(GameObject targetObject)
         {
-            if (EffectSystem.Instance == null || targetRenderer == null)
+            if (EffectSystem.Instance == null || targetObject == null)
             {
                 return;
             }
 
-            Debug.Log($"[GameMode] 攻击抵达目标，触发震动特效: {targetRenderer.name}");
-            EffectSystem.Instance.PlayShakeEffect(new SpriteRenderer[] { targetRenderer }, shakeDuration);
+            Debug.Log($"[GameMode] 攻击抵达目标，触发震动特效: {targetObject.name}");
+            EffectSystem.Instance.PlayShakeEffect(new GameObject[] { targetObject }, shakeDuration);
         }
     }
 }

@@ -411,13 +411,13 @@ namespace Game
         /// <summary>
         /// 播放震动特效
         /// </summary>
-        /// <param name="spriteRenderers">要震动的SpriteRenderer数组</param>
+        /// <param name="gameObjects">要震动的GameObject数组</param>
         /// <param name="duration">持续时间（秒）</param>
-        public void PlayShakeEffect(SpriteRenderer[] spriteRenderers, float duration)
+        public void PlayShakeEffect(GameObject[] gameObjects, float duration)
         {
-            if (spriteRenderers == null || spriteRenderers.Length == 0)
+            if (gameObjects == null || gameObjects.Length == 0)
             {
-                Debug.LogWarning("[EffectSystem] SpriteRenderer数组为空");
+                Debug.LogWarning("[EffectSystem] GameObject数组为空");
                 return;
             }
 
@@ -433,7 +433,7 @@ namespace Game
                 StopShakeEffect();
             }
 
-            shakeEffectCoroutine = StartCoroutine(ShakeEffectCoroutine(spriteRenderers, duration));
+            shakeEffectCoroutine = StartCoroutine(ShakeEffectCoroutine(gameObjects, duration));
         }
 
         /// <summary>
@@ -453,7 +453,7 @@ namespace Game
         /// <summary>
         /// 震动特效协程
         /// </summary>
-        private IEnumerator ShakeEffectCoroutine(SpriteRenderer[] spriteRenderers, float duration)
+        private IEnumerator ShakeEffectCoroutine(GameObject[] gameObjects, float duration)
         {
             isPlayingShakeEffect = true;
             OnShakeEffectStart?.Invoke();
@@ -461,14 +461,14 @@ namespace Game
             // 缓存原始位置
             List<PositionCache> cacheList = new List<PositionCache>();
 
-            foreach (var sr in spriteRenderers)
+            foreach (var go in gameObjects)
             {
-                if (sr == null) continue;
+                if (go == null) continue;
 
                 PositionCache cache = new PositionCache
                 {
-                    transform = sr.transform,
-                    originalPosition = sr.transform.localPosition
+                    transform = go.transform,
+                    originalPosition = go.transform.localPosition
                 };
                 cacheList.Add(cache);
             }
@@ -749,8 +749,18 @@ namespace Game
                 return;
             }
 
+            // 将SpriteRenderer转换为GameObject数组
+            List<GameObject> gameObjects = new List<GameObject>();
+            foreach (var sr in testSpriteRenderers)
+            {
+                if (sr != null)
+                {
+                    gameObjects.Add(sr.gameObject);
+                }
+            }
+
             Debug.Log($"[EffectSystem] 测试震动特效，持续 {testDuration} 秒");
-            PlayShakeEffect(testSpriteRenderers.ToArray(), testDuration);
+            PlayShakeEffect(gameObjects.ToArray(), testDuration);
         }
 
         /// <summary>

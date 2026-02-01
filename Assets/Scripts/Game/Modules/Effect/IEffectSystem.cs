@@ -82,9 +82,9 @@ namespace Game
         /// <summary>
         /// 播放震动特效
         /// </summary>
-        /// <param name="spriteRenderers">要震动的SpriteRenderer数组</param>
+        /// <param name="gameObjects">要震动的GameObject数组</param>
         /// <param name="duration">持续时间（秒）</param>
-        void PlayShakeEffect(SpriteRenderer[] spriteRenderers, float duration);
+        void PlayShakeEffect(GameObject[] gameObjects, float duration);
 
         /// <summary>
         /// 停止震动特效
