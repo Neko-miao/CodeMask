@@ -23,11 +23,15 @@ namespace Game.States
         private BattleUIController _battleUIController;
         private BattleController _battleController;
         private MonsterSpawner _monsterSpawner;
+        private QWEAudioPlayer _qweAudioPlayer;
         private int _currentLevelId = 1;
         
         public void OnEnter()
         {
             Debug.Log("[InGameStateHandler] Entering InGame State");
+            
+            // 创建QWE音频播放器
+            CreateQWEAudioPlayer();
             
             // 初始化战斗控制器
             _battleController = new BattleController();
@@ -56,6 +60,9 @@ namespace Game.States
             
             // 销毁主玩家
             DestroyMainPlayer();
+            
+            // 销毁QWE音频播放器
+            DestroyQWEAudioPlayer();
             
             // 关闭战斗UI
             var uiMgr = GameInstance.Instance.GetComp<IUIMgr>();
@@ -207,6 +214,42 @@ namespace Game.States
             {
                 audioMgr.StopBGM(0.5f);
                 Debug.Log("[InGameStateHandler] Background music stopped");
+            }
+        }
+        
+        #endregion
+        
+        #region QWE音频播放器
+        
+        /// <summary>
+        /// 创建QWE音频播放器
+        /// </summary>
+        private void CreateQWEAudioPlayer()
+        {
+            // 检查是否已存在
+            if (_qweAudioPlayer != null)
+            {
+                Debug.LogWarning("[InGameStateHandler] QWEAudioPlayer already exists");
+                return;
+            }
+            
+            // 创建GameObject并添加组件
+            var audioPlayerGo = new GameObject("QWEAudioPlayer");
+            _qweAudioPlayer = audioPlayerGo.AddComponent<QWEAudioPlayer>();
+            
+            Debug.Log("[InGameStateHandler] QWEAudioPlayer created");
+        }
+        
+        /// <summary>
+        /// 销毁QWE音频播放器
+        /// </summary>
+        private void DestroyQWEAudioPlayer()
+        {
+            if (_qweAudioPlayer != null)
+            {
+                Object.Destroy(_qweAudioPlayer.gameObject);
+                _qweAudioPlayer = null;
+                Debug.Log("[InGameStateHandler] QWEAudioPlayer destroyed");
             }
         }
         
