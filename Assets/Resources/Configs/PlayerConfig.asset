@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9526ecf89f4faae4eb09c3706d7b7c3d, type: 3}
   m_Name: PlayerConfig
   m_EditorClassIdentifier: 
-  defaultCharacterId: 10086
+  defaultCharacterId: 9999
   spawnConfig:
     defaultSpawnPosition: {x: 0, y: 0, z: 0}
     defaultSpawnRotation: {x: 0, y: 0, z: 0}

@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 868721271651242081}
   m_Layer: 0
-  m_Name: Cat
+  m_Name: OX
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -40,13 +40,17 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 868721271651242081}
     m_Modifications:
+    - target: {fileID: 130886303374939990, guid: 64c2def1551e28f4c95400c19b4a29ce, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 325585639976533276, guid: 64c2def1551e28f4c95400c19b4a29ce, type: 3}
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1786592765332535417, guid: 64c2def1551e28f4c95400c19b4a29ce, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3588327437144290982, guid: 64c2def1551e28f4c95400c19b4a29ce, type: 3}
       propertyPath: m_Enabled
@@ -96,10 +100,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6563293184462306658, guid: 64c2def1551e28f4c95400c19b4a29ce, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7792316637796295223, guid: 64c2def1551e28f4c95400c19b4a29ce, type: 3}
       propertyPath: m_Sprite
       value: 
-      objectReference: {fileID: 21300000, guid: 9909283d0b5a10c428a4634e0285027b, type: 3}
+      objectReference: {fileID: 21300000, guid: 0a3019b1067f5e945a600768772022d1, type: 3}
     - target: {fileID: 7792316637796295223, guid: 64c2def1551e28f4c95400c19b4a29ce, type: 3}
       propertyPath: m_Color.b
       value: 1
