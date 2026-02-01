@@ -19,6 +19,14 @@ namespace Game
         [Tooltip("MaskPresentation父物体，子物体按顺序对应MaskType枚举")]
         private Transform maskPresentation;
         
+        [Header("按键显示")]
+        [SerializeField]
+        [Tooltip("按键字母父物体(Btn)，子物体顺序：bg, Q, W, E")]
+        private Transform btnParent;
+        [SerializeField] private GameObject keyQ;
+        [SerializeField] private GameObject keyW;
+        [SerializeField] private GameObject keyE;
+        
         [Header("状态")]
         [SerializeField] private MaskState currentState = MaskState.Active;
 
@@ -45,6 +53,7 @@ namespace Game
         private Rigidbody2D rb;
         private BoxCollider2D boxCollider;
         private Transform[] maskIcons;  // 缓存子物体引用
+        private KeyCode boundKey = KeyCode.None;  // 绑定的按键
 
         // 飞行状态
         private bool isFlying;
@@ -66,6 +75,7 @@ namespace Game
         public MaskState CurrentState => currentState;
         public MaskType MaskType => maskType;
         public MaskData MaskData => maskData;
+        public KeyCode BoundKey => boundKey;
         public bool IsFlying => isFlying;
         public Action OnFlightComplete;
         public Action<MaskState> OnStateChanged;
@@ -81,6 +91,9 @@ namespace Game
             
             // 缓存MaskPresentation下的所有子物体
             CacheMaskIcons();
+            
+            // 自动获取按键子物体（如果没有手动设置）
+            AutoCacheKeyObjects();
             
             SetupPhysicsMaterial();
         }
@@ -101,6 +114,19 @@ namespace Game
             }
             
             Debug.Log($"[Mask] 缓存了 {childCount} 个Icon子物体");
+        }
+        
+        /// <summary>
+        /// 自动获取按键子物体（如果btnParent已设置但Q/W/E未设置）
+        /// </summary>
+        private void AutoCacheKeyObjects()
+        {
+            if (btnParent == null) return;
+            
+            // 按名称查找子物体
+            if (keyQ == null) keyQ = btnParent.Find("Q")?.gameObject;
+            if (keyW == null) keyW = btnParent.Find("W")?.gameObject;
+            if (keyE == null) keyE = btnParent.Find("E")?.gameObject;
         }
 
         void Start()
@@ -168,6 +194,42 @@ namespace Game
         }
 
         public void SetWearingFollowTarget(Transform target) => wearingFollowTarget = target;
+        
+        /// <summary>
+        /// 设置绑定的按键，并更新按键字母显示
+        /// </summary>
+        /// <param name="key">绑定的按键（Q/W/E）</param>
+        public void SetBoundKey(KeyCode key)
+        {
+            boundKey = key;
+            UpdateKeyDisplay();
+            Debug.Log($"[Mask] 绑定按键: {key}");
+        }
+        
+        /// <summary>
+        /// 根据绑定的按键更新字母显示
+        /// </summary>
+        private void UpdateKeyDisplay()
+        {
+            // 隐藏所有按键字母
+            if (keyQ != null) keyQ.SetActive(false);
+            if (keyW != null) keyW.SetActive(false);
+            if (keyE != null) keyE.SetActive(false);
+            
+            // 显示绑定的按键字母
+            switch (boundKey)
+            {
+                case KeyCode.Q:
+                    if (keyQ != null) keyQ.SetActive(true);
+                    break;
+                case KeyCode.W:
+                    if (keyW != null) keyW.SetActive(true);
+                    break;
+                case KeyCode.E:
+                    if (keyE != null) keyE.SetActive(true);
+                    break;
+            }
+        }
         
         /// <summary>
         /// 设置面具类型
