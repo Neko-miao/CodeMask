@@ -132,6 +132,43 @@ namespace GameConfigs
         [Tooltip("生命限制，0表示无限制")]
         [Range(0, 100)]
         public int lifeLimit = 3;
+
+        [Header("音频设置")]
+        [Tooltip("背景音乐")]
+        public AudioClip backgroundMusic;
+
+        [Tooltip("背景音乐名称（如果不指定AudioClip，则使用此名称从Resources/Audio/BGM加载）")]
+        public string backgroundMusicName;
+
+        [Tooltip("背景音乐是否循环播放")]
+        public bool loopBackgroundMusic = true;
+
+        [Tooltip("背景音乐淡入时间（秒）")]
+        [Range(0f, 5f)]
+        public float musicFadeInDuration = 0.5f;
+
+        /// <summary>
+        /// 获取背景音乐（优先使用AudioClip，其次使用名称从Resources加载）
+        /// </summary>
+        public AudioClip GetBackgroundMusic()
+        {
+            if (backgroundMusic != null)
+            {
+                return backgroundMusic;
+            }
+            
+            if (!string.IsNullOrEmpty(backgroundMusicName))
+            {
+                return Resources.Load<AudioClip>($"Audio/BGM/{backgroundMusicName}");
+            }
+            
+            return null;
+        }
+
+        /// <summary>
+        /// 是否有背景音乐配置
+        /// </summary>
+        public bool HasBackgroundMusic => backgroundMusic != null || !string.IsNullOrEmpty(backgroundMusicName);
     }
 
     /// <summary>
