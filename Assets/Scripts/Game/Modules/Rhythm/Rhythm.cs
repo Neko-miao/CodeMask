@@ -28,6 +28,50 @@ namespace Game
         /// </summary>
         private MaskType maskType = MaskType.None;
 
+        #region 脉动缩放效果
+
+        /// <summary>
+        /// 是否启用脉动效果
+        /// </summary>
+        [Header("脉动缩放效果")]
+        [SerializeField]
+        private bool enablePulse = true;
+
+        /// <summary>
+        /// 脉动周期（秒），完成一次放大缩小的时间
+        /// </summary>
+        [SerializeField]
+        private float pulseDuration = 1f;
+
+        /// <summary>
+        /// 最大缩放倍数
+        /// </summary>
+        [SerializeField]
+        private float pulseMaxScale = 1.2f;
+
+        /// <summary>
+        /// 最小缩放倍数
+        /// </summary>
+        [SerializeField]
+        private float pulseMinScale = 1f;
+
+        /// <summary>
+        /// 脉动计时器
+        /// </summary>
+        private float pulseTimer = 0f;
+
+        /// <summary>
+        /// 初始缩放值
+        /// </summary>
+        private Vector3 originalScale;
+
+        /// <summary>
+        /// 是否已记录初始缩放值
+        /// </summary>
+        private bool hasRecordedOriginalScale = false;
+
+        #endregion
+
         #region Properties
 
         /// <summary>
@@ -83,6 +127,9 @@ namespace Game
             actionType = type;
             maskType = mask;
             isMoving = true;
+
+            // 初始化脉动效果
+            InitializePulse();
         }
 
         /// <summary>
@@ -115,6 +162,93 @@ namespace Game
 
             // 向左移动
             transform.position += Vector3.left * moveSpeed * Time.deltaTime;
+
+            // 脉动缩放效果
+            UpdatePulseEffect();
+        }
+
+        /// <summary>
+        /// 初始化脉动效果
+        /// </summary>
+        private void InitializePulse()
+        {
+            if (!enablePulse) return;
+
+            // 记录初始缩放值
+            originalScale = transform.localScale;
+            hasRecordedOriginalScale = true;
+            pulseTimer = 0f;
+        }
+
+        /// <summary>
+        /// 更新脉动缩放效果
+        /// </summary>
+        private void UpdatePulseEffect()
+        {
+            if (!enablePulse || pulseDuration <= 0f) return;
+
+            // 记录初始缩放值（兼容未调用Initialize的情况）
+            if (!hasRecordedOriginalScale)
+            {
+                originalScale = transform.localScale;
+                hasRecordedOriginalScale = true;
+            }
+
+            // 更新计时器
+            pulseTimer += Time.deltaTime;
+
+            // 使用正弦函数实现平滑的放大缩小效果
+            // 一个完整周期内：0 -> 最大 -> 最小 -> 最大 -> 0
+            // 使用 sin 函数，周期为 pulseDuration
+            float t = (pulseTimer / pulseDuration) * Mathf.PI * 2f;
+            
+            // 将 sin 值从 [-1, 1] 映射到 [pulseMinScale, pulseMaxScale]
+            float scaleMultiplier = Mathf.Lerp(pulseMinScale, pulseMaxScale, (Mathf.Sin(t) + 1f) * 0.5f);
+
+            // 应用缩放
+            transform.localScale = originalScale * scaleMultiplier;
+        }
+
+        /// <summary>
+        /// 启用脉动效果
+        /// </summary>
+        /// <param name="duration">脉动周期（秒）</param>
+        /// <param name="maxScale">最大缩放倍数</param>
+        /// <param name="minScale">最小缩放倍数</param>
+        public void EnablePulse(float duration = 1f, float maxScale = 1.2f, float minScale = 1f)
+        {
+            enablePulse = true;
+            pulseDuration = Mathf.Max(0.1f, duration);
+            pulseMaxScale = maxScale;
+            pulseMinScale = minScale;
+            pulseTimer = 0f;
+        }
+
+        /// <summary>
+        /// 禁用脉动效果
+        /// </summary>
+        public void DisablePulse()
+        {
+            enablePulse = false;
+            
+            // 恢复原始缩放
+            if (hasRecordedOriginalScale)
+            {
+                transform.localScale = originalScale;
+            }
+        }
+
+        /// <summary>
+        /// 设置脉动参数
+        /// </summary>
+        /// <param name="duration">脉动周期（秒）</param>
+        /// <param name="maxScale">最大缩放倍数</param>
+        /// <param name="minScale">最小缩放倍数</param>
+        public void SetPulseParameters(float duration, float maxScale, float minScale)
+        {
+            pulseDuration = Mathf.Max(0.1f, duration);
+            pulseMaxScale = maxScale;
+            pulseMinScale = minScale;
         }
     }
 }
